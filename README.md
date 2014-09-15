@@ -1,4 +1,5 @@
-# OpenIEC61850 - Overview
+# OpenIEC61850 - Overview [![Build Status](https://travis-ci.org/gythialy/openiec61850.svg)](https://travis-ci.org/gythialy/openiec61850)
+
 This is UNOFFICIAL, fork from [openmuc](http://www.openmuc.org/index.php?id=35).
 
 OpenIEC61850 is an open source implementation of the IEC 61850 standards series licensed under the LGPL. The library is written in Java and consists of an MMS client and server. Up to now the following ACSI services are supported:
