@@ -1,0 +1,7 @@
+include 'josistack', 'jositransport', 'openiec61850', 'openiec61850-clientgui', 'openiec61850-sample'
+
+project(":josistack").projectDir = file("projects/josistack")
+project(":jositransport").projectDir = file("projects/jositransport")
+project(":openiec61850").projectDir = file("projects/openiec61850")
+project(":openiec61850-clientgui").projectDir = file("projects/clientgui")
+project(":openiec61850-sample").projectDir = file("projects/sample")
