@@ -107,7 +107,9 @@ public final class AcseAssociation {
 	 * A server that got an Association Request Indication may use this function to accept the association.
 	 * 
 	 * @param payload
+	 *            the payload to send with the accept message
 	 * @throws IOException
+	 *             if an error occures accepting the association
 	 */
 	public void accept(ByteBuffer payload) throws IOException {
 
@@ -245,20 +247,27 @@ public final class AcseAssociation {
 	 * @param port
 	 * @param address
 	 * @param tSAP
+	 * @param aeQualifierCalling
+	 * @param aeQualifierCalled
+	 * @param apTitleCalling
+	 * @param apTitleCalled
 	 * @throws IOException
 	 */
 	void startAssociation(ByteBuffer payload, InetAddress address, int port, InetAddress localAddr, int localPort,
-			String authenticationParameter, byte[] pSelRemote, ClientTSap tSAP) throws IOException {
+			String authenticationParameter, byte[] sSelRemote, byte[] sSelLocal, byte[] pSelRemote, ClientTSap tSAP,
+			int[] apTitleCalled, int[] apTitleCalling, int aeQualifierCalled, int aeQualifierCalling)
+			throws IOException {
 		if (connected == true) {
 			throw new IOException();
 		}
 
 		int payloadLength = payload.limit() - payload.position();
 
-		AP_title called_ap_title = new AP_title(new byte[] { 0x06, 0x05, 0x29, (byte) 0x87, 0x67, 0x01, 0x01 });
-		AE_qualifier called_and_calling_ae_qualifier = new AE_qualifier(new byte[] { 0x02, 0x01, 0x0c });
+		AP_title called_ap_title = new AP_title(new BerObjectIdentifier(apTitleCalled));
+		AP_title calling_ap_title = new AP_title(new BerObjectIdentifier(apTitleCalling));
 
-		AP_title calling_ap_title = new AP_title(new byte[] { 0x06, 0x04, 0x29, (byte) 0x87, 0x67, 0x01 });
+		AE_qualifier called_ae_qualifier = new AE_qualifier(new BerInteger(aeQualifierCalled));
+		AE_qualifier calling_ae_qualifier = new AE_qualifier(new BerInteger(aeQualifierCalling));
 
 		Myexternal.SubChoice_encoding encoding = new Myexternal.SubChoice_encoding(new BerAnyNoDecode(payloadLength),
 				null, null);
@@ -280,9 +289,9 @@ public final class AcseAssociation {
 					null, null);
 		}
 
-		AARQ_apdu aarq = new AARQ_apdu(null, application_context_name, called_ap_title,
-				called_and_calling_ae_qualifier, null, null, calling_ap_title, called_and_calling_ae_qualifier, null,
-				null, sender_acse_requirements, mechanism_name, authentication_value, null, null, userInformation);
+		AARQ_apdu aarq = new AARQ_apdu(null, application_context_name, called_ap_title, called_ae_qualifier, null,
+				null, calling_ap_title, calling_ae_qualifier, null, null, sender_acse_requirements, mechanism_name,
+				authentication_value, null, null, userInformation);
 		ACSE_apdu acse = new ACSE_apdu(aarq, null, null, null);
 
 		BerByteArrayOutputStream berOStream = new BerByteArrayOutputStream(200, true);
@@ -311,7 +320,8 @@ public final class AcseAssociation {
 		ssduLengths.add(payloadLength);
 
 		ByteBuffer res = null;
-		res = startSConnection(ssduList, ssduOffsets, ssduLengths, address, port, localAddr, localPort, tSAP);
+		res = startSConnection(ssduList, ssduOffsets, ssduLengths, address, port, localAddr, localPort, tSAP,
+				sSelRemote, sSelLocal);
 
 		associateResponseAPDU = decodePConResponse(res);
 
@@ -350,7 +360,8 @@ public final class AcseAssociation {
 	 * @throws IOException
 	 */
 	private ByteBuffer startSConnection(List<byte[]> ssduList, List<Integer> ssduOffsets, List<Integer> ssduLengths,
-			InetAddress address, int port, InetAddress localAddr, int localPort, ClientTSap tSAP) throws IOException {
+			InetAddress address, int port, InetAddress localAddr, int localPort, ClientTSap tSAP, byte[] sSelRemote,
+			byte[] sSelLocal) throws IOException {
 		if (connected == true) {
 			throw new IOException();
 		}
@@ -410,8 +421,8 @@ public final class AcseAssociation {
 		// Parameter length
 		spduHeader[idx++] = 0x02;
 		// Calling Session Selector
-		spduHeader[idx++] = 0x00;
-		spduHeader[idx++] = 0x01;
+		spduHeader[idx++] = sSelRemote[0];
+		spduHeader[idx++] = sSelRemote[1];
 
 		// Called Session Selector
 		// Parameter type: Called Session Selector (52)
@@ -419,8 +430,8 @@ public final class AcseAssociation {
 		// Parameter length
 		spduHeader[idx++] = 0x02;
 		// Called Session Selector
-		spduHeader[idx++] = 0x00;
-		spduHeader[idx++] = 0x01;
+		spduHeader[idx++] = sSelLocal[0];
+		spduHeader[idx++] = sSelLocal[1];
 
 		// Session user data
 		// Parameter type: Session user data (193)
@@ -601,10 +612,13 @@ public final class AcseAssociation {
 	 * last byte of the ACSE SDU.
 	 * 
 	 * @param pduBuffer
-	 * @throws TimeoutException
+	 *            buffer to write the received pdu into
 	 * @throws DecodingException
+	 *             if a decoding error occurs
 	 * @throws IOException
-	 *             an non recoverable error occurs. Afterwards the association should be closed by the user.
+	 *             if a non recoverable error occurs. Afterwards the association should be closed by the user
+	 * @throws TimeoutException
+	 *             if a timeout occurs
 	 */
 	public void receive(ByteBuffer pduBuffer) throws DecodingException, IOException, TimeoutException {
 		if (connected == false) {

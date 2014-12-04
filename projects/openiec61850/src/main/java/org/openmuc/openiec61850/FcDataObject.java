@@ -28,18 +28,17 @@ import java.util.List;
 import org.openmuc.openiec61850.internal.mms.asn1.Data;
 import org.openmuc.openiec61850.internal.mms.asn1.DataSequence;
 
+/**
+ * This class represents a functionally constraint DataObject. That means it has unique reference and
+ * FunctionalConstraint. A DataObject as defined in part 7-3 is made up of 1..n FcDataObjects where n is the number of
+ * different FunctionalConstraints that the children of the DataObject have. An FcDataObject can have children of types
+ * FcDataObject, Array, ConstructedDataAttribute or BasicDataAttribute.
+ *
+ * @author Stefan Feuerhahn
+ *
+ */
 public class FcDataObject extends FcModelNode {
 
-	/**
-	 * This class represents a functionally constraint DataObject. That means it has unique name and
-	 * FunctionalConstraint. A DataObject as defined in part 7-3 is made up of 1..n FcDataObjects where n is the number
-	 * of different FunctionalConstraints that the children of the DataObject have.
-	 * 
-	 * @param objectReference
-	 * @param fc
-	 * @param children
-	 *            These ModelNodes can be of Type FcDataObject, Array, ConstructedDataAttribute or BasicDataAttribute
-	 */
 	public FcDataObject(ObjectReference objectReference, Fc fc, List<FcModelNode> children) {
 
 		this.children = new LinkedHashMap<String, ModelNode>((int) ((children.size() / 0.75) + 1));

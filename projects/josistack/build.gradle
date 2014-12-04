@@ -1,6 +1,12 @@
 
 def projectName = 'jOSIStack'
 
+tasks.withType(JavaCompile) { options.encoding = "UTF-8" }
+
+javadoc {
+  options.encoding = "UTF-8"
+}
+
 dependencies {
   compile project(':jositransport')
   compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'

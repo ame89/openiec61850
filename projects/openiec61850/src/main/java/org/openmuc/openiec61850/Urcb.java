@@ -61,6 +61,8 @@ public class Urcb extends Rcb {
 	 * Reserve URCB - The attribute Resv (if set to TRUE) shall indicate that the URCB is currently exclusively reserved
 	 * for the client that has set the value to TRUE. Other clients shall not be allowed to set any attribute of that
 	 * URCB.
+	 * 
+	 * @return the Resv child
 	 */
 	public BdaBoolean getResv() {
 		return (BdaBoolean) children.get("Resv");

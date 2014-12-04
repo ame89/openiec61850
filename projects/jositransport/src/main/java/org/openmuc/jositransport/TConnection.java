@@ -27,7 +27,6 @@ import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -494,9 +493,8 @@ public final class TConnection {
 	 *
 	 * @param messageFragmentTimeout
 	 *            in milliseconds
-	 * @throws SocketException
 	 */
-	public void setMessageFragmentTimeout(int messageFragmentTimeout) throws SocketException {
+	public void setMessageFragmentTimeout(int messageFragmentTimeout) {
 		this.messageFragmentTimeout = messageFragmentTimeout;
 	}
 

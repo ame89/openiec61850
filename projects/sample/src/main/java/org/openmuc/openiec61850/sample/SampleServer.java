@@ -121,10 +121,11 @@ public class SampleServer implements ServerEventListener {
 	}
 
 	@Override
-	public void write(List<BasicDataAttribute> bdas) throws ServiceError {
+	public List<ServiceError> write(List<BasicDataAttribute> bdas) {
 		for (BasicDataAttribute bda : bdas) {
 			logger.info("got a write request: " + bda);
 		}
+		return null;
 
 	}
 

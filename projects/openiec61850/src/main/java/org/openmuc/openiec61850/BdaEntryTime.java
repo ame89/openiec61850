@@ -49,6 +49,7 @@ public final class BdaEntryTime extends BasicDataAttribute {
 	 * 00:00:00 UTC. Note that timestamps before 1984 are not valid as they cannot be stored.
 	 * 
 	 * @param timestamp
+	 *            the number of ms since epoch 1970-01-01
 	 */
 	public void setTimestamp(long timestamp) {
 		long msSince1984 = timestamp - 441763200000l;

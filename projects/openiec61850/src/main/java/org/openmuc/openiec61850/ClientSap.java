@@ -66,6 +66,9 @@ public final class ClientSap {
 	/**
 	 * Use this constructor to create a client SAP that uses the given <code>SocketFactory</code> to connect to servers.
 	 * You could pass an SSLSocketFactory to enable SSL.
+	 * 
+	 * @param socketFactory
+	 *            the socket factory to construct the socket
 	 */
 	public ClientSap(SocketFactory socketFactory) {
 		acseSap = new ClientAcseSap(socketFactory);
@@ -124,6 +127,46 @@ public final class ClientSap {
 	}
 
 	/**
+	 * Sets the remote/called Session-Selector (S-SEL). The default remote S-SEL is byte[] { 0, 1 }.
+	 * 
+	 * @param sSelRemote
+	 *            the remote/called S-SEL.
+	 */
+	public void setSSelRemote(byte[] sSelRemote) {
+		acseSap.sSelRemote = sSelRemote;
+	}
+
+	/**
+	 * Sets the local/calling Session-Selector (S-SEL). The default local S-SEL is byte[] { 0, 1 }.
+	 * 
+	 * @param sSelLocal
+	 *            the local/calling S-SEL.
+	 */
+	public void setSSelLocal(byte[] sSelLocal) {
+		acseSap.sSelLocal = sSelLocal;
+	}
+
+	/**
+	 * Sets the remote/called Presentation-Selector (P-SEL). The default remote P-SEL is byte[] { 0, 0, 0, 1 }.
+	 * 
+	 * @param pSelRemote
+	 *            the remote/called P-SEL.
+	 */
+	public void setPSelRemote(byte[] pSelRemote) {
+		acseSap.pSelRemote = pSelRemote;
+	}
+
+	/**
+	 * Sets the local/calling Presentation-Selector (P-SEL). The default local P-SEL is byte[] { 0, 0, 0, 1 }.
+	 * 
+	 * @param pSelLocal
+	 *            the local/calling P-SEL.
+	 */
+	public void setPSelLocal(byte[] pSelLocal) {
+		acseSap.pSelLocal = pSelLocal;
+	}
+
+	/**
 	 * Sets the remote/called Transport-Selector (T-SEL). It is optionally transmitted in the OSI Transport Layer
 	 * connection request (CR). The default remote T-SEL is byte[] { 0, 1 }.
 	 * 
@@ -145,6 +188,58 @@ public final class ClientSap {
 	 */
 	public void setTSelLocal(byte[] tSelLocal) {
 		acseSap.tSap.tSelLocal = tSelLocal;
+	}
+
+	/**
+	 * Set the maxTPDUSize. The default maxTPduSize is 65531 (see RFC 1006).
+	 * 
+	 * @param maxTPduSizeParam
+	 *            The maximum length is equal to 2^(maxTPduSizeParam) octets. Note that the actual TSDU size that can be
+	 *            transfered is equal to TPduSize-3. Default is 65531 octets (see RFC 1006), 7 &lt;= maxTPduSizeParam
+	 *            &lt;= 16, needs to be set before listening or connecting
+	 */
+	public void setMaxTPduSizeParameter(int maxTPduSizeParam) {
+		acseSap.tSap.setMaxTPDUSizeParam(maxTPduSizeParam);
+	}
+
+	/**
+	 * Sets the remote/called Application Process Title. The default value is int[] { 1, 1, 999, 1, 1 }
+	 * 
+	 * @param title
+	 *            the remote/called AP title.
+	 */
+	public void setApTitleCalled(int[] title) {
+		acseSap.setApTitleCalled(title);
+	}
+
+	/**
+	 * Sets the local/calling Application Process Title. The default value is int[] { 1, 1, 999, 1 }
+	 * 
+	 * @param title
+	 *            the local/calling AP title.
+	 */
+	public void setApTitleCalling(int[] title) {
+		acseSap.setApTitleCalling(title);
+	}
+
+	/**
+	 * Sets the remote/called Application Entity Qualifier. The default value is 12.
+	 * 
+	 * @param qualifier
+	 *            the remote/called AE Qualifier
+	 */
+	public void setAeQualifierCalled(int qualifier) {
+		acseSap.setAeQualifierCalled(qualifier);
+	}
+
+	/**
+	 * Sets the local/calling Application Entity Qualifier. The default value is 12.
+	 * 
+	 * @param qualifier
+	 *            the local/calling AE Qualifier
+	 */
+	public void setAeQualifierCalling(int qualifier) {
+		acseSap.setAeQualifierCalling(qualifier);
 	}
 
 	/**
@@ -178,9 +273,11 @@ public final class ClientSap {
 	 *            the port to connect to. Usually the MMS port is 102.
 	 * @param authenticationParameter
 	 *            an optional authentication parameters that is transmitted. It will be omitted if equal to null.
-	 * @return the association object.
+	 * @param reportListener
+	 *            the listener to be notified of incoming reports
+	 * @return the association object
 	 * @throws IOException
-	 *             if any kind of error occurs trying build up the association.
+	 *             if any kind of error occurs trying build up the association
 	 */
 	public ClientAssociation associate(InetAddress address, int port, String authenticationParameter,
 			ClientEventListener reportListener) throws IOException {
@@ -192,14 +289,20 @@ public final class ClientSap {
 	 * Connects to the IEC 61850 MMS server at the given address and port and returns the resulting association object.
 	 * 
 	 * @param address
-	 *            the address to connect to.
+	 *            the address to connect to
 	 * @param port
 	 *            the port to connect to. Usually the MMS port is 102.
 	 * @param authenticationParameter
 	 *            an optional authentication parameters that is transmitted. It will be omitted if equal to null.
+	 * @param localAddr
+	 *            the local address to use
+	 * @param localPort
+	 *            the local port to use
+	 * @param reportListener
+	 *            the listener to be notified of incoming reports
 	 * @return the association object.
 	 * @throws IOException
-	 *             if any kind of error occurs trying build up the association.
+	 *             if any kind of error occurs trying build up the association
 	 */
 	public ClientAssociation associate(InetAddress address, int port, String authenticationParameter,
 			InetAddress localAddr, int localPort, ClientEventListener reportListener) throws IOException {
@@ -210,6 +313,22 @@ public final class ClientSap {
 
 		if (address == null) {
 			throw new IllegalArgumentException("address may not be null");
+		}
+
+		if (acseSap.sSelRemote == null) {
+			throw new IllegalArgumentException("sSelRemote may not be null");
+		}
+
+		if (acseSap.sSelRemote.length != 2) {
+			throw new IllegalArgumentException("sSelRemote lenght must be two");
+		}
+
+		if (acseSap.sSelLocal == null) {
+			throw new IllegalArgumentException("sSelLocal may not be null");
+		}
+
+		if (acseSap.sSelLocal.length != 2) {
+			throw new IllegalArgumentException("sSelLocal lenght must be two");
 		}
 
 		ClientAssociation clientAssociation = new ClientAssociation(address, port, localAddr, localPort,

@@ -108,6 +108,7 @@ public class ServerTSap {
 	 * Starts a new thread that listens on the configured port. This method is non-blocking.
 	 * 
 	 * @throws IOException
+	 *             if a starting to listen fails
 	 */
 	public void startListening() throws IOException {
 		started = true;
@@ -128,22 +129,21 @@ public class ServerTSap {
 	}
 
 	/**
-	 * Set the maxTPDUSize. The default maxTPDUSize is 65531 (see RFC 1006). Only use this function if you want to
-	 * change this.
+	 * Set the maxTPDUSize. The default maxTPduSize is 65531 (see RFC 1006).
 	 * 
-	 * @param maxTPDUSizeParam
-	 *            The maximum length is equal to 2^(maxTPDUSizeParam) octets. Note that the actual TSDU size that can be
-	 *            transfered is equal to TPDUSize-3. Default is 65531 octets (see RFC 1006), 7 <= maxTPDUSizeParam <=
-	 *            16, needs to be set before listening or connecting
+	 * @param maxTPduSizeParam
+	 *            The maximum length is equal to 2^(maxTPduSizeParam) octets. Note that the actual TSDU size that can be
+	 *            transfered is equal to TPduSize-3. Default is 65531 octets (see RFC 1006), 7 &lt;= maxTPduSizeParam
+	 *            &lt;= 16, needs to be set before listening or connecting
 	 */
-	public void setMaxTPDUSizeParam(int maxTPDUSizeParam) {
+	public void setMaxTPDUSizeParam(int maxTPduSizeParam) {
 		if (started == true) {
 			throw new RuntimeException("Trying to set parameter although server has started.");
 		}
-		if (maxTPDUSizeParam < 7 || maxTPDUSizeParam > 16) {
+		if (maxTPduSizeParam < 7 || maxTPduSizeParam > 16) {
 			throw new IllegalArgumentException("maxTPDUSizeParam is out of bound");
 		}
-		this.maxTPDUSizeParam = maxTPDUSizeParam;
+		this.maxTPDUSizeParam = maxTPduSizeParam;
 	}
 
 	/**
@@ -190,20 +190,22 @@ public class ServerTSap {
 	}
 
 	/**
-	 * Get the maxTPDUSize Parameter to be used by this TSAP
+	 * Get the maximum TPDU size parameter to be used by this TSAP
+	 * 
+	 * @return the maximum TPDU size parameter
 	 */
 	public int getMaxTPDUSizeParam() {
 		return maxTPDUSizeParam;
 	}
 
 	/**
-	 * Get the maximum TPDUSize. This is equal to 2^(maxTPDUSizeParam)
+	 * Calculates and returns the maximum TPDUSize. This is equal to 2^(maxTPDUSizeParam)
 	 * 
 	 * @param maxTPDUSizeParam
+	 *            the size parameter
 	 * @return the maximum TPDU size
-	 * @throws IOException
 	 */
-	public static int getMaxTPDUSize(int maxTPDUSizeParam) throws IOException {
+	public static int getMaxTPDUSize(int maxTPDUSizeParam) {
 		if (maxTPDUSizeParam < 7 || maxTPDUSizeParam > 16) {
 			throw new IllegalArgumentException("maxTPDUSizeParam is out of bound");
 		}

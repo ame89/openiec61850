@@ -29,6 +29,7 @@ import org.openmuc.openiec61850.clientgui.BasicDataBind;
 
 public class TapCommandDataBind extends BasicDataBind<BdaTapCommand> {
 
+	@SuppressWarnings("unchecked")
 	private final JComboBox tapCommand = new JComboBox(BdaTapCommand.TapCommand.values());
 
 	public TapCommandDataBind(BdaTapCommand data) {

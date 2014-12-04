@@ -30,13 +30,6 @@ import org.openmuc.openiec61850.internal.mms.asn1.DataSequence;
 
 public final class ConstructedDataAttribute extends FcModelNode {
 
-	/**
-	 * 
-	 * @param objectReference
-	 * @param fc
-	 * @param children
-	 *            can be of type CONSTRUCTED_DATA_ATTRIBUTE and/or BASIC_DATA_ATTRIBUTE
-	 */
 	public ConstructedDataAttribute(ObjectReference objectReference, Fc fc, List<FcModelNode> children) {
 		this.objectReference = objectReference;
 		this.fc = fc;

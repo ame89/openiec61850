@@ -1104,11 +1104,12 @@ public final class ClientAssociation {
 	 * should call this method for creation on the server side
 	 *
 	 * @param dataSet
+	 *            the data set to be created on the server side
 	 * @throws ServiceError
 	 *             if a ServiceError is returned by the server.
 	 * @throws IOException
-	 *             if a fatal association error occurs. The association object will be closed and can no longer be used
-	 *             after this exception is thrown.
+	 *             if a fatal IO error occurs. The association object will be closed and can no longer be used after
+	 *             this exception is thrown.
 	 */
 	public void createDataSet(DataSet dataSet) throws ServiceError, IOException {
 		ConfirmedServiceRequest serviceRequest = constructCreateDataSetRequest(dataSet);
@@ -1186,8 +1187,9 @@ public final class ClientAssociation {
 	 * @param dataSet
 	 *            the DataSet that is to be read.
 	 * @return a list indicating ServiceErrors that may have occurred.
-	 * @throws ServiceError
 	 * @throws IOException
+	 *             if a fatal IO error occurs. The association object will be closed and can no longer be used after
+	 *             this exception is thrown.
 	 */
 	public List<ServiceError> getDataSetValues(DataSet dataSet) throws IOException {
 
@@ -1345,21 +1347,32 @@ public final class ClientAssociation {
 	}
 
 	/**
-	 * Sets the selected values of the given Report Control Block. Note that all these parameters may only be set if
+	 * Sets the selected values of the given report control block. Note that all these parameters may only be set if
 	 * reporting for this report control block is not enabled and if it is not reserved by another client. The
 	 * parameters PurgeBuf, EntryId are only applicable if the given rcb is of type BRCB.
 	 *
 	 * @param rcb
+	 *            the report control block
 	 * @param setRptId
+	 *            whether to set the report ID
 	 * @param setDatSet
+	 *            whether to set the data set
 	 * @param setOptFlds
+	 *            whether to set the optional fields
 	 * @param setBufTm
+	 *            whether to set the buffer time
 	 * @param setTrgOps
+	 *            whether to set the trigger options
 	 * @param setIntgPd
+	 *            whether to set the integrity period
 	 * @param setPurgeBuf
+	 *            whether to set purge buffer
 	 * @param setEntryId
+	 *            whether to set the entry ID
 	 * @return a list indicating ServiceErrors that may have occurred.
 	 * @throws IOException
+	 *             if a fatal IO error occurs. The association object will be closed and can no longer be used after
+	 *             this exception is thrown.
 	 */
 	public List<ServiceError> setRcbValues(Rcb rcb, boolean setRptId, boolean setDatSet, boolean setOptFlds,
 			boolean setBufTm, boolean setTrgOps, boolean setIntgPd, boolean setPurgeBuf, boolean setEntryId)
@@ -1414,13 +1427,6 @@ public final class ClientAssociation {
 		return serviceErrors;
 	}
 
-	/**
-	 * See iec61850-8-1 Table 64 for the order of the report information To get the updated values, use the getDataSet
-	 * method for reports
-	 *
-	 * @param rpt
-	 * @return
-	 */
 	private Report processReport(MmsPdu mmsPdu) throws ServiceError {
 
 		if (mmsPdu.unconfirmedPdu == null) {
@@ -1591,7 +1597,10 @@ public final class ClientAssociation {
 	 * @return false if the selection/reservation was not successful (because it is already selected by another client).
 	 *         Otherwise true is returned.
 	 * @throws ServiceError
+	 *             if a ServiceError is returned by the server.
 	 * @throws IOException
+	 *             if a fatal IO error occurs. The association object will be closed and can no longer be used after
+	 *             this exception is thrown.
 	 */
 	public boolean select(FcModelNode controlDataObject) throws ServiceError, IOException {
 		BdaVisibleString sbo;
@@ -1634,7 +1643,10 @@ public final class ClientAssociation {
 	 * @param controlDataObject
 	 *            needs to be a controllable Data Object that contains a Data Attribute named "Oper".
 	 * @throws ServiceError
+	 *             if a ServiceError is returned by the server
 	 * @throws IOException
+	 *             if a fatal IO error occurs. The association object will be closed and can no longer be used after
+	 *             this exception is thrown.
 	 */
 	public void operate(FcModelNode controlDataObject) throws ServiceError, IOException {
 		ConstructedDataAttribute oper;

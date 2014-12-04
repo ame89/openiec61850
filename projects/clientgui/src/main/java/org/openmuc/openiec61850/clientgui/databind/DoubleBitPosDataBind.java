@@ -29,6 +29,7 @@ import org.openmuc.openiec61850.clientgui.BasicDataBind;
 
 public class DoubleBitPosDataBind extends BasicDataBind<BdaDoubleBitPos> {
 
+	@SuppressWarnings("unchecked")
 	private final JComboBox valueField = new JComboBox(BdaDoubleBitPos.DoubleBitPos.values());
 
 	public DoubleBitPosDataBind(BdaDoubleBitPos data) {

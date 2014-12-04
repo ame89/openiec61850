@@ -34,7 +34,6 @@ import org.openmuc.openiec61850.internal.mms.asn1.TypeSpecification.SubSeq_struc
 
 final class DataDefinitionResParser {
 
-	@SuppressWarnings("unchecked")
 	static LogicalNode parseGetDataDefinitionResponse(ConfirmedServiceResponse confirmedServiceResponse,
 			ObjectReference lnRef) throws ServiceError {
 

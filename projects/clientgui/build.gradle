@@ -1,6 +1,12 @@
 
 def projectName = 'OpenIEC61850 Client GUI'
 
+tasks.withType(JavaCompile) { options.encoding = "UTF-8" }
+
+javadoc {
+  options.encoding = "UTF-8"
+}
+
 dependencies {
   compile project(':openiec61850')
   compile group: 'com.toedter', name: 'jcalendar', version: '1.4'

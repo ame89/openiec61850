@@ -32,18 +32,26 @@ import org.openmuc.openiec61850.internal.mms.asn1.DataSequence;
 import org.openmuc.openiec61850.internal.mms.asn1.TypeSpecification;
 import org.openmuc.openiec61850.internal.mms.asn1.TypeSpecification.SubSeq_array;
 
+/**
+ * An Array can contain up to n instances of one and the same DataObject, ConstructedDataAttribute, or
+ * BasicDataAttribute. The children of the array have the name that equals the index in the array (e.g. "0","1" etc.)
+ * 
+ * @author Stefan Feuerhahn
+ *
+ */
 public final class Array extends FcModelNode {
 
 	private final List<ModelNode> items;
 
 	/**
-	 * An Array can contain up to n instances of one and the same DataObject, ConstructedDataAttribute, or
-	 * BasicDataAttribute. The children of the array have the name that equals the index in the array (e.g. "0","1"
-	 * etc.)
+	 * Creates an array object.
 	 * 
 	 * @param objectReference
+	 *            the reference of the array
 	 * @param fc
+	 *            the functional constraint of the array
 	 * @param children
+	 *            the children of the array
 	 */
 	public Array(ObjectReference objectReference, Fc fc, List<FcModelNode> children) {
 		this.objectReference = objectReference;

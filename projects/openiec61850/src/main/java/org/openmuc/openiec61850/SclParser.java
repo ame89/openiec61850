@@ -20,7 +20,9 @@
  */
 package org.openmuc.openiec61850;
 
-import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -58,13 +60,20 @@ final class SclParser {
 	private boolean useResvTmsAttributes = false;
 
 	private final List<LnSubDef> dataSetDefs = new ArrayList<LnSubDef>();
-	private final List<LnSubDef> rcbDefs = new ArrayList<LnSubDef>();
 
 	public List<ServerSap> getServerSaps() {
 		return serverSaps;
 	}
 
 	public void parse(String icdFile) throws SclParseException {
+		try {
+			parse(new FileInputStream(icdFile));
+		} catch (FileNotFoundException e) {
+			throw new SclParseException(e);
+		}
+	}
+
+	public void parse(InputStream icdFileStream) throws SclParseException {
 
 		typeDefinitions = new TypeDefinitions();
 
@@ -72,7 +81,7 @@ final class SclParser {
 		factory.setIgnoringComments(true);
 
 		try {
-			doc = factory.newDocumentBuilder().parse("file:" + new File(icdFile).getAbsolutePath());
+			doc = factory.newDocumentBuilder().parse(icdFileStream);
 		} catch (Exception e) {
 			throw new SclParseException(e);
 		}
@@ -393,7 +402,7 @@ final class SclParser {
 						doName = node.getNodeValue();
 					}
 					else if (nodeName.equals("daName")) {
-						if (daName != "") {
+						if (!node.getNodeValue().isEmpty()) {
 							daName = "." + node.getNodeValue();
 						}
 					}
@@ -420,6 +429,7 @@ final class SclParser {
 				if (doName != "") {
 
 					String objectReference = iedName + ldInst + "/" + prefix + lnClass + lnInst + "." + doName + daName;
+
 					ModelNode fcdaNode = serverModel.findModelNode(objectReference, fc);
 
 					if (fcdaNode == null) {

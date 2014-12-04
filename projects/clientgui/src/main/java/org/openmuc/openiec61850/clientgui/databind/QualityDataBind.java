@@ -34,7 +34,9 @@ import org.openmuc.openiec61850.clientgui.BasicDataBind;
 
 public class QualityDataBind extends BasicDataBind<BdaQuality> {
 
+	@SuppressWarnings("unchecked")
 	private final JComboBox validity = new JComboBox(BdaQuality.Validity.values());
+
 	private final JCheckBox badReference = new JCheckBox("BadReference");
 	private final JCheckBox failure = new JCheckBox("Failure");
 	private final JCheckBox inaccurate = new JCheckBox("Inaccurate");

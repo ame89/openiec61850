@@ -42,7 +42,13 @@ public final class BdaTimestamp extends BasicDataAttribute {
 	/**
 	 * The SecondSinceEpoch shall be the interval in seconds continuously counted from the epoch 1970-01-01 00:00:00 UTC
 	 */
-	public long getSecondsSinceEpoch() {
+
+	/**
+	 * Returns the value as the number of seconds since epoch 1970-01-01 00:00:00 UTC
+	 * 
+	 * @return the number of seconds since epoch 1970-01-01 00:00:00 UTC
+	 */
+	private long getSecondsSinceEpoch() {
 		return ((0xffL & value[0]) << 24 | (0xffL & value[1]) << 16 | (0xffL & value[2]) << 8 | (0xffL & value[3]));
 	}
 
@@ -57,8 +63,10 @@ public final class BdaTimestamp extends BasicDataAttribute {
 	 * NOTE 2 The resolution of a time stamp may be 1/2**1 (= 0,5 s) if only the first bit is used; or may be 1/2**2 (=
 	 * 0,25 s) if the first two bits are used; or may be approximately 60 ns if all 24 bits are used. The resolution
 	 * provided by an IED is outside the scope of this standard.
+	 * 
+	 * @return the fraction of seconds
 	 */
-	public int getFractionOfSecond() {
+	private int getFractionOfSecond() {
 		return ((0xff & value[4]) << 16 | (0xff & value[5]) << 8 | (0xff & value[6]));
 	}
 
@@ -140,6 +148,9 @@ public final class BdaTimestamp extends BasicDataAttribute {
 	 * occurred before the initialization of the time source of the device.
 	 * 
 	 * Java {@link Date} and {@link Calendar} objects do handle leap seconds, so this is usually true.
+	 * 
+	 * @return TRUE of the attribute LeapSecondsKnown shall indicate that the value for SecondSinceEpoch takes into
+	 *         account all leap seconds occurred
 	 */
 	public boolean getLeapSecondsKnown() {
 		return ((value[7] & 0x80) != 0);
@@ -148,6 +159,8 @@ public final class BdaTimestamp extends BasicDataAttribute {
 	/**
 	 * The attribute clockFailure shall indicate that the time source of the sending device is unreliable. The value of
 	 * the TimeStamp shall be ignored.
+	 * 
+	 * @return true if the time source of the sending device is unreliable
 	 */
 	public boolean getClockFailure() {
 		return ((value[7] & 0x40) != 0);
@@ -156,6 +169,8 @@ public final class BdaTimestamp extends BasicDataAttribute {
 	/**
 	 * The attribute clockNotSynchronized shall indicate that the time source of the sending device is not synchronized
 	 * with the external UTC time.
+	 * 
+	 * @return true if the time source of the sending device is not synchronized
 	 */
 	public boolean getClockNotSynchronized() {
 		return ((value[7] & 0x20) != 0);
@@ -167,6 +182,8 @@ public final class BdaTimestamp extends BasicDataAttribute {
 	 * FractionOfSecond
 	 * 
 	 * If the time is set via Java {@link Date} objects, the accuracy is 1 ms, that is a timeAccuracy value of 10.
+	 * 
+	 * @return the time accuracy
 	 */
 	public int getTimeAccuracy() {
 		return ((value[7] & 0x1f));

@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Vector;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -573,7 +574,6 @@ final class ServerAssociation {
 	 * references. Examples: 1. DGEN1 2. DGEN1$CF 3. DGEN1$CF$GnBlk
 	 *
 	 */
-	@SuppressWarnings("unchecked")
 	private GetVariableAccessAttributesResponse handleGetVariableAccessAttributesRequest(
 			GetVariableAccessAttributesRequest getVariableAccessAttributesRequest) throws ServiceError {
 		if (getVariableAccessAttributesRequest.name == null) {
@@ -901,23 +901,32 @@ final class ServerAssociation {
 						"handleSetDataValuesRequest: less than one variableAccessSpecification or data element is not allowed, or listOfData ne listOfVar");
 			}
 
-			Iterator<Data> iterator = listOfData.iterator();
+			Iterator<Data> mmsDataIterator = listOfData.iterator();
 
-			for (VariableDef variableDef : listOfVariable) {
-				Data data = iterator.next();
+			List<BasicDataAttribute> totalBdasToBeWritten = new ArrayList<BasicDataAttribute>();
+			int[] numBdas = new int[listOfData.size()];
 
-				FcModelNode modelNode = serverModel.getNodeFromVariableDef(variableDef);
+			int i = -1;
+			synchronized (serverModel) {
+				for (VariableDef variableDef : listOfVariable) {
+					i++;
+					Data mmsData = mmsDataIterator.next();
 
-				if (modelNode == null) {
-					// 10 indicates error "object-non-existent"
-					mmsResponseValues.add(new WriteResponse.SubChoice(new BerInteger(10L), null));
-				}
-				else {
-					synchronized (serverModel) {
-						mmsResponseValues.add(getWriteResult(modelNode, data));
+					FcModelNode modelNode = serverModel.getNodeFromVariableDef(variableDef);
+
+					if (modelNode == null) {
+						// 10 indicates error "object-non-existent"
+						mmsResponseValues.add(new WriteResponse.SubChoice(new BerInteger(10L), null));
+					}
+					else {
+
+						getFirstWriteResults(mmsResponseValues, totalBdasToBeWritten, numBdas, i, modelNode, mmsData);
 					}
 				}
+
+				writeAndFillMissingWriteResults(mmsResponseValues, totalBdasToBeWritten, numBdas);
 			}
+
 		}
 		else if (variableAccessSpecification.variableListName != null) {
 			logger.debug("Got a SetDataSetValues request.");
@@ -926,12 +935,23 @@ final class ServerAssociation {
 
 			// TODO handle non-persisten DataSets too
 
-			DataSet dataSetCopy = serverModel.getDataSet(dataSetRef).copy();
+			DataSet dataSet = serverModel.getDataSet(dataSetRef);
 
-			Iterator<Data> dataIterator = listOfData.iterator();
+			Iterator<Data> mmsDataIterator = listOfData.iterator();
 
-			for (FcModelNode dataSetMember : dataSetCopy) {
-				mmsResponseValues.add(getWriteResult(dataSetMember, dataIterator.next()));
+			List<BasicDataAttribute> totalBdasToBeWritten = new ArrayList<BasicDataAttribute>();
+			int[] numBdas = new int[listOfData.size()];
+
+			int i = -1;
+			synchronized (serverModel) {
+				for (FcModelNode dataSetMember : dataSet) {
+					i++;
+					Data mmsData = mmsDataIterator.next();
+
+					getFirstWriteResults(mmsResponseValues, totalBdasToBeWritten, numBdas, i, dataSetMember, mmsData);
+				}
+
+				writeAndFillMissingWriteResults(mmsResponseValues, totalBdasToBeWritten, numBdas);
 			}
 
 		}
@@ -941,6 +961,80 @@ final class ServerAssociation {
 		}
 
 		return new WriteResponse(mmsResponseValues);
+	}
+
+	private void writeAndFillMissingWriteResults(List<WriteResponse.SubChoice> mmsResponseValues,
+			List<BasicDataAttribute> totalBdasToBeWritten, int[] numBdas) {
+		int i;
+		if (totalBdasToBeWritten.size() != 0) {
+			List<ServiceError> serviceErrors = serverSap.serverEventListener.write(totalBdasToBeWritten);
+			ListIterator<WriteResponse.SubChoice> mmsResponseIterator = mmsResponseValues.listIterator();
+			if (serviceErrors == null || serviceErrors.size() != totalBdasToBeWritten.size()) {
+				while (mmsResponseIterator.hasNext()) {
+					if (mmsResponseIterator.next() == null) {
+						mmsResponseIterator.set(writeSuccess);
+					}
+				}
+				for (BasicDataAttribute bda : totalBdasToBeWritten) {
+					bda.mirror.setValueFrom(bda);
+				}
+			}
+			else {
+				i = -1;
+				Iterator<ServiceError> serviceErrorIterator = serviceErrors.iterator();
+				Iterator<BasicDataAttribute> bdaToBeWrittenIterator = totalBdasToBeWritten.iterator();
+				while (mmsResponseIterator.hasNext()) {
+					i++;
+					if (mmsResponseIterator.next() == null) {
+						for (int j = 0; j < numBdas[i]; j++) {
+							ServiceError serviceError = serviceErrorIterator.next();
+							BasicDataAttribute bda = bdaToBeWrittenIterator.next();
+							if (serviceError != null) {
+								mmsResponseIterator.set(new WriteResponse.SubChoice(new BerInteger(
+										serviceErrorToMmsError(serviceError)), null));
+							}
+							else {
+								bda.mirror.setValueFrom(bda);
+							}
+						}
+					}
+				}
+			}
+
+		}
+	}
+
+	private void getFirstWriteResults(List<WriteResponse.SubChoice> mmsResponseValues,
+			List<BasicDataAttribute> totalBdasToBeWritten, int[] numBdas, int i, FcModelNode dataSetMember, Data mmsData) {
+		WriteResponse.SubChoice writeResult = getWriteResult(dataSetMember, mmsData);
+		if (writeResult == null) {
+			FcModelNode fcModelNodeCopy = (FcModelNode) dataSetMember.copy();
+			try {
+				fcModelNodeCopy.setValueFromMmsDataObj(mmsData);
+			} catch (ServiceError e) {
+				logger.warn("SetDataValues failed because of data missmatch.", e);
+				mmsResponseValues.add(new WriteResponse.SubChoice(new BerInteger(serviceErrorToMmsError(e)), null));
+				return;
+			}
+
+			if (fcModelNodeCopy.fc == Fc.CO) {
+				// TODO timeactivate operate
+				fcModelNodeCopy = (BasicDataAttribute) fcModelNodeCopy.getChild("ctlVal");
+				// TODO write origin and ctlNum if they exist
+			}
+			else {
+
+			}
+
+			List<BasicDataAttribute> bdas = fcModelNodeCopy.getBasicDataAttributes();
+			totalBdasToBeWritten.addAll(bdas);
+			numBdas[i] = bdas.size();
+			mmsResponseValues.add(null);
+
+		}
+		else {
+			mmsResponseValues.add(writeResult);
+		}
 	}
 
 	private WriteResponse.SubChoice getWriteResult(FcModelNode modelNode, Data mmsData) {
@@ -968,12 +1062,12 @@ final class ServerAssociation {
 
 				/* Direct control with normal security (direct-operate) */
 				if (ctlModel == 1) {
-					return operate(modelNode, mmsData);
+					return null;
 				}
 				/* SBO control with normal security (operate-once or operate-many) */
 				else if (ctlModel == 2) {
 					if (cdcParent.isSelectedBy(this)) {
-						return operate(modelNode, mmsData);
+						return null;
 					}
 					else {
 						// 3 indicates error "object_access_denied"
@@ -1165,55 +1259,40 @@ final class ServerAssociation {
 		}
 		else {
 
-			FcModelNode fcModelNodeCopy = (FcModelNode) modelNode.copy();
-
-			try {
-				fcModelNodeCopy.setValueFromMmsDataObj(mmsData);
-			} catch (ServiceError e1) {
-				return new WriteResponse.SubChoice(new BerInteger(serviceErrorToMmsError(e1)), null);
-			}
-
-			List<BasicDataAttribute> bdas = fcModelNodeCopy.getBasicDataAttributes();
-
-			WriteResponse.SubChoice result = writeSuccess;
-			try {
-				serverSap.serverEventListener.write(bdas);
-			} catch (ServiceError e) {
-				result = new WriteResponse.SubChoice(new BerInteger(serviceErrorToMmsError(e)), null);
-			}
-
-			for (BasicDataAttribute bda : bdas) {
-				bda.mirror.setValueFrom(bda);
-			}
-			return result;
+			return null;
 		}
 
 	}
 
-	private WriteResponse.SubChoice operate(FcModelNode modelNode, Data mmsData) {
-		FcModelNode fcModelNodeCopy = (FcModelNode) modelNode.copy();
-		try {
-			fcModelNodeCopy.setValueFromMmsDataObj(mmsData);
-		} catch (ServiceError e) {
-			logger.warn("SetDataValues failed because of data missmatch.", e);
-			return new WriteResponse.SubChoice(new BerInteger(serviceErrorToMmsError(e)), null);
-		}
-
-		// TODO timeactivate operate
-
-		BasicDataAttribute ctlValBda = (BasicDataAttribute) fcModelNodeCopy.getChild("ctlVal");
-		List<BasicDataAttribute> bdas = new ArrayList<BasicDataAttribute>(1);
-		bdas.add(ctlValBda);
-		try {
-			serverSap.serverEventListener.write(bdas);
-		} catch (ServiceError e) {
-			return new WriteResponse.SubChoice(new BerInteger(serviceErrorToMmsError(e)), null);
-		}
-		ctlValBda.mirror.setValueFrom(ctlValBda);
-		// TODO write origin and ctlNum if they exist
-
-		return writeSuccess;
-	}
+	// private WriteResponse.SubChoice operate(FcModelNode modelNode, Data mmsData) {
+	// FcModelNode fcModelNodeCopy = (FcModelNode) modelNode.copy();
+	// try {
+	// fcModelNodeCopy.setValueFromMmsDataObj(mmsData);
+	// } catch (ServiceError e) {
+	// logger.warn("SetDataValues failed because of data missmatch.", e);
+	// return new WriteResponse.SubChoice(new BerInteger(serviceErrorToMmsError(e)), null);
+	// }
+	//
+	// // TODO timeactivate operate
+	//
+	// BasicDataAttribute ctlValBda = (BasicDataAttribute) fcModelNodeCopy.getChild("ctlVal");
+	// List<BasicDataAttribute> bdas = new ArrayList<BasicDataAttribute>(1);
+	// bdas.add(ctlValBda);
+	// List<ServiceError> serviceErrors;
+	// try {
+	// serviceErrors = serverSap.serverEventListener.write(bdas);
+	// } catch (ServiceError e) {
+	// return new WriteResponse.SubChoice(new BerInteger(serviceErrorToMmsError(e)), null);
+	// }
+	// if (serviceErrors != null && serviceErrors.size() == bdas.size() && serviceErrors.get(1) != null) {
+	// return new WriteResponse.SubChoice(new BerInteger(serviceErrorToMmsError(serviceErrors.get(1))), null);
+	// }
+	//
+	// ctlValBda.mirror.setValueFrom(ctlValBda);
+	// // TODO write origin and ctlNum if they exist
+	//
+	// return writeSuccess;
+	// }
 
 	private int serviceErrorToMmsError(ServiceError e) {
 
@@ -1394,15 +1473,5 @@ final class ServerAssociation {
 			acseAssociation.disconnect();
 		}
 	}
-
-	public void stop() {
-		// TODO Auto-generated method stub
-
-	}
-
-	// public void sendReport(Report report) throws IOException {
-	// // TODO Auto-generated method stub
-	//
-	// }
 
 }

@@ -21,6 +21,7 @@
 package org.openmuc.openiec61850;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -75,6 +76,12 @@ public final class ServerSap {
 	public static List<ServerSap> getSapsFromSclFile(String sclFilePath) throws SclParseException {
 		SclParser sclParserObject = new SclParser();
 		sclParserObject.parse(sclFilePath);
+		return sclParserObject.getServerSaps();
+	}
+
+	public static List<ServerSap> getSapsFromSclFile(InputStream sclFileStream) throws SclParseException {
+		SclParser sclParserObject = new SclParser();
+		sclParserObject.parse(sclFileStream);
 		return sclParserObject.getServerSaps();
 	}
 
@@ -325,7 +332,7 @@ public final class ServerSap {
 		synchronized (associations) {
 			listening = false;
 			for (ServerAssociation association : associations) {
-				association.stop();
+				association.close();
 			}
 			associations.clear();
 		}

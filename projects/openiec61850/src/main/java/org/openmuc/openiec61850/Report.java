@@ -70,6 +70,8 @@ public class Report {
 	/**
 	 * Sequence numberThe parameter MoreSegmentsFollow indicates that more report segments with the same sequence number
 	 * follow, counted up for every {@code Report} instance generated
+	 * 
+	 * @return the sequence number
 	 */
 	public Integer getSqNum() {
 		return sqNum;
@@ -78,6 +80,8 @@ public class Report {
 	/**
 	 * For the case of long reports that do not fit into one message, a single report shall be divided into subreports.
 	 * Each segment – of one report – shall be numbered with the same sequence number and a unique SubSqNum.
+	 * 
+	 * @return the subsequence number
 	 */
 	public Integer getSubSqNum() {
 		return subSqNum;
@@ -85,6 +89,8 @@ public class Report {
 
 	/**
 	 * The parameter MoreSegmentsFollow indicates that more report segments with the same sequence number follow
+	 * 
+	 * @return true if more segments follow
 	 */
 	public boolean isMoreSegmentsFollow() {
 		return moreSegmentsFollow;
@@ -98,6 +104,8 @@ public class Report {
 	 * The parameter BufOvfl shall indicate to the client that entries within the buffer may have been lost. The
 	 * detection of possible loss of information occurs when a client requests a resynchronization to a non-existent
 	 * entry or to the first entry in the queue.
+	 * 
+	 * @return true if buffer overflow is true
 	 */
 	public boolean isBufOvfl() {
 		return bufOvfl;
@@ -109,14 +117,13 @@ public class Report {
 
 	/**
 	 * The parameter TimeOfEntry shall specify the time when the EntryID was created
+	 * 
+	 * @return the time of entry
 	 */
 	public BdaEntryTime getTimeOfEntry() {
 		return timeOfEntry;
 	}
 
-	/**
-	 * Unique Id of this Report
-	 */
 	public BdaOctetString getEntryId() {
 		return entryId;
 	}
@@ -127,20 +134,26 @@ public class Report {
 
 	/**
 	 * Indicator of data set members included in the report
+	 * 
+	 * @return the inclusion bit string as a byte array
 	 */
 	public byte[] getInclusionBitString() {
 		return inclusionBitString;
 	}
 
 	/**
-	 * Reason for the inclusion
+	 * Gets the reasons for inclusion
+	 * 
+	 * @return the reasons for inclusion
 	 */
 	public List<BdaReasonForInclusion> getReasonCodes() {
 		return reasonCodes;
 	}
 
 	/**
-	 * Data set reference - this is an updated copy
+	 * Gets the data set associated with this report.
+	 * 
+	 * @return the data set associated with this report.
 	 */
 	public DataSet getDataSet() {
 		return dataSet;

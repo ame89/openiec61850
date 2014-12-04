@@ -33,6 +33,8 @@ public abstract class Rcb extends FcDataObject {
 	/**
 	 * Gets the RptID (Report ID). The RptID will be included in every report sent by the server. If it is equal to
 	 * NULL, then the RptID sent will be equal to the reference of the RCB.
+	 * 
+	 * @return the report ID
 	 */
 	public BdaVisibleString getRptId() {
 		return (BdaVisibleString) children.get("RptID");
@@ -68,6 +70,7 @@ public abstract class Rcb extends FcDataObject {
 	 * will be responsible for incrementing/maintaining the ConfRev value. When configuration changes occur due to
 	 * SetBRCBValues, the IED shall be responsible for incrementing the value of ConfRev.
 	 * 
+	 * @return the configuration revision
 	 */
 	public BdaInt32U getConfRev() {
 		return (BdaInt32U) children.get("ConfRev");
@@ -88,6 +91,7 @@ public abstract class Rcb extends FcDataObject {
 	 * the buffering of internal notifications caused by data-change (dchg), quality-change (qchg), data update (dupd)
 	 * by the BRCB for inclusion into a single report.
 	 * 
+	 * @return the buffer time
 	 */
 	public BdaInt32U getBufTm() {
 		return (BdaInt32U) children.get("BufTm");
@@ -98,6 +102,7 @@ public abstract class Rcb extends FcDataObject {
 	 * enable set to TRUE. This number is to be incremented by the BRCB for each report generated and sent. The
 	 * increment shall occur once the BRCB has formatted the report and requested for transmission.
 	 * 
+	 * @return the sequence number
 	 */
 	public BdaInt8U getSqNum() {
 		return (BdaInt8U) children.get("SqNum");

@@ -95,8 +95,10 @@ public final class DataSet implements Iterable<FcModelNode> {
 	}
 
 	/**
-	 * those DataSets defined in the SCL file are not deletable. All other DataSets are deletable. Note that no
+	 * Those DataSets defined in the SCL file are not deletable. All other DataSets are deletable. Note that no
 	 * Reports/Logs may be using the DataSet otherwise it cannot be deleted (but this function will still return true).
+	 * 
+	 * @return true if deletable
 	 */
 	public boolean isDeletable() {
 		return deletable;
