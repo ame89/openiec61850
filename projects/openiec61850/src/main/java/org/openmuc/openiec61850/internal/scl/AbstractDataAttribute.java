@@ -20,87 +20,84 @@
  */
 package org.openmuc.openiec61850.internal.scl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.openmuc.openiec61850.SclParseException;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class AbstractDataAttribute extends AbstractElement {
 
-	// attributes not needed: valKind
+    // attributes not needed: valKind
 
-	private String sAddr = null; /* optional - short address */
-	private String bType = null; /* mandatory - basic type */
+    private String sAddr = null; /* optional - short address */
+    private String bType = null; /* mandatory - basic type */
 
-	private String type = null; /* conditional - if bType = "Enum" or "Struct" */
-	private int count = 0; /* optional - number of array elements */
-	private List<Value> values = null;
+    private String type = null; /* conditional - if bType = "Enum" or "Struct" */
+    private int count = 0; /* optional - number of array elements */
+    private List<Value> values = null;
 
-	public AbstractDataAttribute(Node xmlNode) throws SclParseException {
-		super(xmlNode);
+    public AbstractDataAttribute(Node xmlNode) throws SclParseException {
+        super(xmlNode);
 
-		NamedNodeMap attributes = xmlNode.getAttributes();
+        NamedNodeMap attributes = xmlNode.getAttributes();
 
-		for (int i = 0; i < attributes.getLength(); i++) {
-			Node node = attributes.item(i);
-			String nodeName = node.getNodeName();
+        for (int i = 0; i < attributes.getLength(); i++) {
+            Node node = attributes.item(i);
+            String nodeName = node.getNodeName();
 
-			if (nodeName.equals("type")) {
-				type = node.getNodeValue();
-			}
-			else if (nodeName.equals("sAddr")) {
-				sAddr = node.getNodeValue();
-			}
-			else if (nodeName.equals("bType")) {
-				bType = node.getNodeValue();
-			}
-			else if (nodeName.equals("count")) {
-				count = Integer.parseInt(node.getNodeValue());
-			}
-		}
+            if (nodeName.equals("type")) {
+                type = node.getNodeValue();
+            } else if (nodeName.equals("sAddr")) {
+                sAddr = node.getNodeValue();
+            } else if (nodeName.equals("bType")) {
+                bType = node.getNodeValue();
+            } else if (nodeName.equals("count")) {
+                count = Integer.parseInt(node.getNodeValue());
+            }
+        }
 
-		if (bType == null) {
-			throw new SclParseException("Required attribute \"bType\" not found!");
-		}
+        if (bType == null) {
+            throw new SclParseException("Required attribute \"bType\" not found!");
+        }
 
 		/* Parse Val elements */
-		NodeList elements = xmlNode.getChildNodes();
+        NodeList elements = xmlNode.getChildNodes();
 
-		values = new ArrayList<Value>();
+        values = new ArrayList<Value>();
 
-		for (int i = 0; i < elements.getLength(); i++) {
-			Node node = elements.item(i);
+        for (int i = 0; i < elements.getLength(); i++) {
+            Node node = elements.item(i);
 
-			if (node.getNodeName().equals("Val")) {
-				// TODO
-				throw new SclParseException("AbstractDataAttribute(): Val not implemented!");
-				// this.sdos.add(new SDO(node));
-			}
-		}
+            if (node.getNodeName().equals("Val")) {
+                // TODO
+                throw new SclParseException("AbstractDataAttribute(): Val not implemented!");
+                // this.sdos.add(new SDO(node));
+            }
+        }
 
-	}
+    }
 
-	public String getsAddr() {
-		return sAddr;
-	}
+    public String getsAddr() {
+        return sAddr;
+    }
 
-	public String getbType() {
-		return bType;
-	}
+    public String getbType() {
+        return bType;
+    }
 
-	public String getType() {
-		return type;
-	}
+    public String getType() {
+        return type;
+    }
 
-	public int getCount() {
-		return count;
-	}
+    public int getCount() {
+        return count;
+    }
 
-	public List<Value> getValues() {
-		return values;
-	}
+    public List<Value> getValues() {
+        return values;
+    }
 
 }

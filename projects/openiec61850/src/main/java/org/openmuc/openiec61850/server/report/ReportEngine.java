@@ -93,7 +93,8 @@ package org.openmuc.openiec61850.server.report;
 //	/**
 //	 * Map of registered clients.
 //	 */
-//	private final Map<SCSMConnectionHandler, Map<String, ClientReportState>> clients = new HashMap<SCSMConnectionHandler, Map<String, ClientReportState>>();
+//	private final Map<SCSMConnectionHandler, Map<String, ClientReportState>> clients = new HashMap<SCSMConnectionHandler, Map<String,
+// ClientReportState>>();
 //
 //	public ReportEngine(List<AccessPoint> accessPoints) {
 //		super(accessPoints);

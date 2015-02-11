@@ -1,4 +1,3 @@
-
 dependencies {
-  compile project(':openiec61850')
+    compile project(':openiec61850')
 }

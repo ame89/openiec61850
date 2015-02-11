@@ -24,69 +24,69 @@ import java.util.ArrayList;
 
 public final class TypeDefinitions {
 
-	private final ArrayList<LnType> lnodeTypes = new ArrayList<LnType>();
-	private final ArrayList<DoType> doTypes = new ArrayList<DoType>();
-	private final ArrayList<DaType> daTypes = new ArrayList<DaType>();
-	private final ArrayList<EnumType> enumTypes = new ArrayList<EnumType>();
+    private final ArrayList<LnType> lnodeTypes = new ArrayList<LnType>();
+    private final ArrayList<DoType> doTypes = new ArrayList<DoType>();
+    private final ArrayList<DaType> daTypes = new ArrayList<DaType>();
+    private final ArrayList<EnumType> enumTypes = new ArrayList<EnumType>();
 
-	public TypeDefinitions() {
-	}
+    public TypeDefinitions() {
+    }
 
-	public void putLNodeType(LnType lnodeType) {
-		lnodeTypes.add(lnodeType);
-	}
+    public void putLNodeType(LnType lnodeType) {
+        lnodeTypes.add(lnodeType);
+    }
 
-	public void putDOType(DoType doType) {
-		doTypes.add(doType);
-	}
+    public void putDOType(DoType doType) {
+        doTypes.add(doType);
+    }
 
-	public void putDAType(DaType daType) {
-		daTypes.add(daType);
-	}
+    public void putDAType(DaType daType) {
+        daTypes.add(daType);
+    }
 
-	public void putEnumType(EnumType enumType) {
-		enumTypes.add(enumType);
-	}
+    public void putEnumType(EnumType enumType) {
+        enumTypes.add(enumType);
+    }
 
-	public DaType getDaType(String daType) {
-		for (DaType datype : daTypes) {
-			if (datype.id.equals(daType)) {
-				return datype;
-			}
-		}
+    public DaType getDaType(String daType) {
+        for (DaType datype : daTypes) {
+            if (datype.id.equals(daType)) {
+                return datype;
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	public DoType getDOType(String doType) {
-		for (DoType dotype : doTypes) {
-			if (dotype.id.equals(doType)) {
-				return dotype;
-			}
-		}
+    public DoType getDOType(String doType) {
+        for (DoType dotype : doTypes) {
+            if (dotype.id.equals(doType)) {
+                return dotype;
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	public LnType getLNodeType(String lnType) {
+    public LnType getLNodeType(String lnType) {
 
-		for (LnType ntype : lnodeTypes) {
-			if (ntype.id.equals(lnType)) {
-				return ntype;
-			}
-		}
+        for (LnType ntype : lnodeTypes) {
+            if (ntype.id.equals(lnType)) {
+                return ntype;
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	public EnumType getEnumType(String enumTypeRef) {
-		for (EnumType enumType : enumTypes) {
-			if (enumType.id.equals(enumTypeRef)) {
-				return enumType;
-			}
-		}
+    public EnumType getEnumType(String enumTypeRef) {
+        for (EnumType enumType : enumTypes) {
+            if (enumType.id.equals(enumTypeRef)) {
+                return enumType;
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
 }

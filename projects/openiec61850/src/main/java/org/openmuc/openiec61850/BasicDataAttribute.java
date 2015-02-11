@@ -20,102 +20,101 @@
  */
 package org.openmuc.openiec61850;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 abstract public class BasicDataAttribute extends FcModelNode {
 
-	BasicDataAttribute mirror;
+    BasicDataAttribute mirror;
 
-	/** attribute value type */
-	BdaType basicType = null;
+    /**
+     * attribute value type
+     */
+    BdaType basicType = null;
 
-	/** short address, can be used by SCSM and for local data mapping */
-	String sAddr = null;
+    /**
+     * short address, can be used by SCSM and for local data mapping
+     */
+    String sAddr = null;
 
-	boolean dchg;
-	boolean qchg;
-	boolean dupd;
+    boolean dchg;
+    boolean qchg;
+    boolean dupd;
 
-	List<Urcb> chgRcbs = null;
-	List<Urcb> dupdRcbs = null;
+    List<Urcb> chgRcbs = null;
+    List<Urcb> dupdRcbs = null;
 
-	BasicDataAttribute(ObjectReference objectReference, Fc fc, String sAddr, boolean dchg, boolean dupd) {
-		this.objectReference = objectReference;
-		this.fc = fc;
-		this.sAddr = sAddr;
-		this.dchg = dchg;
-		this.dupd = dupd;
+    BasicDataAttribute(ObjectReference objectReference, Fc fc, String sAddr, boolean dchg, boolean dupd) {
+        this.objectReference = objectReference;
+        this.fc = fc;
+        this.sAddr = sAddr;
+        this.dchg = dchg;
+        this.dupd = dupd;
 
-		if (dchg) {
-			chgRcbs = new ArrayList<Urcb>();
-		}
-		if (dupd) {
-			dupdRcbs = new ArrayList<Urcb>();
-		}
+        if (dchg) {
+            chgRcbs = new ArrayList<Urcb>();
+        }
+        if (dupd) {
+            dupdRcbs = new ArrayList<Urcb>();
+        }
 
-	}
+    }
 
-	public boolean getDchg() {
-		return dchg;
-	}
+    public boolean getDchg() {
+        return dchg;
+    }
 
-	public boolean getDupd() {
-		return dupd;
-	}
+    public boolean getDupd() {
+        return dupd;
+    }
 
-	public boolean getQchg() {
-		return dupd;
-	}
+    public boolean getQchg() {
+        return dupd;
+    }
 
-	public BdaType getBasicType() {
-		return basicType;
-	}
+    public BdaType getBasicType() {
+        return basicType;
+    }
 
-	public String getSAddr() {
-		return sAddr;
-	}
+    public String getSAddr() {
+        return sAddr;
+    }
 
-	@Override
-	public ModelNode getChild(String childName, Fc fc) {
-		return null;
-	}
+    @Override
+    public ModelNode getChild(String childName, Fc fc) {
+        return null;
+    }
 
-	@Override
-	public ModelNode getChild(String childName) {
-		return null;
-	}
+    @Override
+    public ModelNode getChild(String childName) {
+        return null;
+    }
 
-	@Override
-	public Collection<ModelNode> getChildren() {
-		return null;
-	}
+    @Override
+    public Collection<ModelNode> getChildren() {
+        return null;
+    }
 
-	@Override
-	public Iterator<ModelNode> iterator() {
-		return Collections.<ModelNode> emptyList().iterator();
-	}
+    @Override
+    public Iterator<ModelNode> iterator() {
+        return Collections.<ModelNode>emptyList().iterator();
+    }
 
-	abstract public void setDefault();
+    abstract public void setDefault();
 
-	@Override
-	public List<BasicDataAttribute> getBasicDataAttributes() {
-		List<BasicDataAttribute> subBasicDataAttributes = new LinkedList<BasicDataAttribute>();
-		subBasicDataAttributes.add(this);
-		return subBasicDataAttributes;
-	}
+    @Override
+    public List<BasicDataAttribute> getBasicDataAttributes() {
+        List<BasicDataAttribute> subBasicDataAttributes = new LinkedList<BasicDataAttribute>();
+        subBasicDataAttributes.add(this);
+        return subBasicDataAttributes;
+    }
 
-	abstract void setValueFrom(BasicDataAttribute bda);
+    abstract void setValueFrom(BasicDataAttribute bda);
 
-	void setMirror(BasicDataAttribute bda) {
-		mirror = bda;
-	}
+    void setMirror(BasicDataAttribute bda) {
+        mirror = bda;
+    }
 
-	@Override
-	public abstract boolean equals(Object obj);
+    @Override
+    public abstract boolean equals(Object obj);
 
 }

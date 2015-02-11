@@ -1,3 +1,9 @@
+v1.1.1 11-Dec-2014
+------------------
+- set default max TPDU size to 1024
+- fix: server stops sending reports when client closed association
+- fix in sample model to enable general interrogation
+
 v1.1.0 17-Oct-2014
 ------------------
 - fixed ServerSap.stop()

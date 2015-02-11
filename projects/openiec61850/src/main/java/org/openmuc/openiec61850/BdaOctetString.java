@@ -20,102 +20,98 @@
  */
 package org.openmuc.openiec61850;
 
-import java.util.Arrays;
-
 import org.openmuc.jasn1.ber.types.BerInteger;
 import org.openmuc.jasn1.ber.types.BerOctetString;
 import org.openmuc.openiec61850.internal.mms.asn1.Data;
 import org.openmuc.openiec61850.internal.mms.asn1.TypeSpecification;
 
+import java.util.Arrays;
+
 public final class BdaOctetString extends BasicDataAttribute {
 
-	private byte[] value;
-	private final int maxLength;
+    private byte[] value;
+    private final int maxLength;
 
-	public BdaOctetString(ObjectReference objectReference, Fc fc, String sAddr, int maxLength, boolean dchg,
-			boolean dupd) {
-		super(objectReference, fc, sAddr, dchg, dupd);
-		basicType = BdaType.OCTET_STRING;
-		this.maxLength = maxLength;
-		setDefault();
-	}
+    public BdaOctetString(ObjectReference objectReference, Fc fc, String sAddr, int maxLength, boolean dchg, boolean dupd) {
+        super(objectReference, fc, sAddr, dchg, dupd);
+        basicType = BdaType.OCTET_STRING;
+        this.maxLength = maxLength;
+        setDefault();
+    }
 
-	public byte[] getValue() {
-		return value;
-	}
+    public byte[] getValue() {
+        return value;
+    }
 
-	public void setValue(byte[] value) {
-		if (value != null && value.length > maxLength) {
-			throw new IllegalArgumentException("OCTET_STRING value size exceeds maxLength of " + maxLength);
-		}
-		this.value = value;
-	}
+    public void setValue(byte[] value) {
+        if (value != null && value.length > maxLength) {
+            throw new IllegalArgumentException("OCTET_STRING value size exceeds maxLength of " + maxLength);
+        }
+        this.value = value;
+    }
 
-	@Override
-	void setValueFrom(BasicDataAttribute bda) {
-		byte[] srcValue = ((BdaOctetString) bda).getValue();
-		if (value.length != srcValue.length) {
-			value = new byte[srcValue.length];
-		}
-		System.arraycopy(srcValue, 0, value, 0, srcValue.length);
-	}
+    @Override
+    void setValueFrom(BasicDataAttribute bda) {
+        byte[] srcValue = ((BdaOctetString) bda).getValue();
+        if (value.length != srcValue.length) {
+            value = new byte[srcValue.length];
+        }
+        System.arraycopy(srcValue, 0, value, 0, srcValue.length);
+    }
 
-	public int getMaxLength() {
-		return maxLength;
-	}
+    public int getMaxLength() {
+        return maxLength;
+    }
 
-	@Override
-	public void setDefault() {
-		value = new byte[0];
-	}
+    @Override
+    public void setDefault() {
+        value = new byte[0];
+    }
 
-	@Override
-	public BdaOctetString copy() {
-		BdaOctetString copy = new BdaOctetString(objectReference, fc, sAddr, maxLength, dchg, dupd);
-		byte[] valueCopy = new byte[value.length];
-		System.arraycopy(value, 0, valueCopy, 0, value.length);
-		copy.setValue(valueCopy);
-		if (mirror == null) {
-			copy.mirror = this;
-		}
-		else {
-			copy.mirror = mirror;
-		}
-		return copy;
-	}
+    @Override
+    public BdaOctetString copy() {
+        BdaOctetString copy = new BdaOctetString(objectReference, fc, sAddr, maxLength, dchg, dupd);
+        byte[] valueCopy = new byte[value.length];
+        System.arraycopy(value, 0, valueCopy, 0, value.length);
+        copy.setValue(valueCopy);
+        if (mirror == null) {
+            copy.mirror = this;
+        } else {
+            copy.mirror = mirror;
+        }
+        return copy;
+    }
 
-	@Override
-	Data getMmsDataObj() {
-		return new Data(null, null, null, null, null, null, null, new BerOctetString(value), null, null, null, null);
-	}
+    @Override
+    Data getMmsDataObj() {
+        return new Data(null, null, null, null, null, null, null, new BerOctetString(value), null, null, null, null);
+    }
 
-	@Override
-	void setValueFromMmsDataObj(Data data) throws ServiceError {
-		if (data.octet_string == null) {
-			throw new ServiceError(ServiceError.TYPE_CONFLICT, "expected type: octet_string");
-		}
-		value = data.octet_string.octetString;
-	}
+    @Override
+    void setValueFromMmsDataObj(Data data) throws ServiceError {
+        if (data.octet_string == null) {
+            throw new ServiceError(ServiceError.TYPE_CONFLICT, "expected type: octet_string");
+        }
+        value = data.octet_string.octetString;
+    }
 
-	@Override
-	TypeSpecification getMmsTypeSpec() {
-		return new TypeSpecification(null, null, null, null, null, null, null, new BerInteger(maxLength * -1), null,
-				null, null, null);
-	}
+    @Override
+    TypeSpecification getMmsTypeSpec() {
+        return new TypeSpecification(null, null, null, null, null, null, null, new BerInteger(maxLength * -1), null, null, null, null);
+    }
 
-	@Override
-	public String toString() {
-		return getReference().toString() + ": " + Arrays.toString(value);
-	}
+    @Override
+    public String toString() {
+        return getReference().toString() + ": " + Arrays.toString(value);
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof BdaOctetString) {
-			return Arrays.equals(value, ((BdaOctetString) obj).getValue());
-		}
-		else {
-			return false;
-		}
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof BdaOctetString) {
+            return Arrays.equals(value, ((BdaOctetString) obj).getValue());
+        } else {
+            return false;
+        }
+    }
 
 }

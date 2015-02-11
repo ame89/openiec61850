@@ -21,11 +21,6 @@
 
 package org.openmuc.openiec61850;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import org.openmuc.jasn1.ber.types.BerInteger;
 import org.openmuc.jasn1.ber.types.string.BerVisibleString;
 import org.openmuc.openiec61850.internal.mms.asn1.AlternateAccess;
@@ -35,174 +30,176 @@ import org.openmuc.openiec61850.internal.mms.asn1.ObjectName;
 import org.openmuc.openiec61850.internal.mms.asn1.VariableDef;
 import org.openmuc.openiec61850.internal.mms.asn1.VariableSpecification;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
 public abstract class FcModelNode extends ModelNode {
 
-	private VariableDef variableDef = null;
-	Fc fc;
-	private ServerAssociation selected = null;
-	private TimerTask task = null;
+    private VariableDef variableDef = null;
+    Fc fc;
+    private ServerAssociation selected = null;
+    private TimerTask task = null;
 
-	public Fc getFc() {
-		return fc;
-	}
+    public Fc getFc() {
+        return fc;
+    }
 
-	@Override
-	public String toString() {
-		return getReference().toString() + " [" + fc + "]";
-	}
+    @Override
+    public String toString() {
+        return getReference().toString() + " [" + fc + "]";
+    }
 
-	boolean select(ServerAssociation association, Timer timer) {
-		if (selected != null) {
-			if (selected != association) {
-				return false;
-			}
-		}
-		else {
-			selected = association;
-			association.selects.add(this);
-		}
+    boolean select(ServerAssociation association, Timer timer) {
+        if (selected != null) {
+            if (selected != association) {
+                return false;
+            }
+        } else {
+            selected = association;
+            association.selects.add(this);
+        }
 
-		ModelNode sboTimeoutNode = association.serverModel.findModelNode(objectReference, Fc.CF).getChild("sboTimeout");
+        ModelNode sboTimeoutNode = association.serverModel.findModelNode(objectReference, Fc.CF).getChild("sboTimeout");
 
-		if (sboTimeoutNode == null) {
-			return true;
-		}
+        if (sboTimeoutNode == null) {
+            return true;
+        }
 
-		long sboTimeout = ((BdaInt32U) sboTimeoutNode).getValue();
+        long sboTimeout = ((BdaInt32U) sboTimeoutNode).getValue();
 
-		if (sboTimeout == 0) {
-			return true;
-		}
+        if (sboTimeout == 0) {
+            return true;
+        }
 
-		class SelectResetTask extends TimerTask {
-			ServerAssociation association;
+        class SelectResetTask extends TimerTask {
+            ServerAssociation association;
 
-			SelectResetTask(ServerAssociation association) {
-				this.association = association;
-			}
+            SelectResetTask(ServerAssociation association) {
+                this.association = association;
+            }
 
-			@Override
-			public void run() {
-				synchronized (association.serverModel) {
-					if (task == this) {
-						task = null;
-						deselectAndRemove(association);
-					}
-				}
-			}
-		}
+            @Override
+            public void run() {
+                synchronized (association.serverModel) {
+                    if (task == this) {
+                        task = null;
+                        deselectAndRemove(association);
+                    }
+                }
+            }
+        }
 
-		if (task != null) {
-			task.cancel();
-		}
+        if (task != null) {
+            task.cancel();
+        }
 
-		task = new SelectResetTask(association);
-		timer.schedule(task, sboTimeout);
+        task = new SelectResetTask(association);
+        timer.schedule(task, sboTimeout);
 
-		return true;
+        return true;
 
-	}
+    }
 
-	void deselectAndRemove(ServerAssociation association) {
-		selected = null;
-		if (task != null) {
-			task.cancel();
-			task = null;
-		}
-		association.selects.remove(this);
-	}
+    void deselectAndRemove(ServerAssociation association) {
+        selected = null;
+        if (task != null) {
+            task.cancel();
+            task = null;
+        }
+        association.selects.remove(this);
+    }
 
-	void deselect() {
-		selected = null;
-		if (task != null) {
-			task.cancel();
-			task = null;
-		}
-	}
+    void deselect() {
+        selected = null;
+        if (task != null) {
+            task.cancel();
+            task = null;
+        }
+    }
 
-	boolean isSelected() {
-		if (selected == null) {
-			return false;
-		}
-		return true;
-	}
+    boolean isSelected() {
+        if (selected == null) {
+            return false;
+        }
+        return true;
+    }
 
-	boolean isSelectedBy(ServerAssociation association) {
-		if (selected == association) {
-			return true;
-		}
-		return false;
-	}
+    boolean isSelectedBy(ServerAssociation association) {
+        if (selected == association) {
+            return true;
+        }
+        return false;
+    }
 
-	VariableDef getMmsVariableDef() {
+    VariableDef getMmsVariableDef() {
 
-		if (variableDef != null) {
-			return variableDef;
-		}
+        if (variableDef != null) {
+            return variableDef;
+        }
 
-		AlternateAccess alternateAccess = null;
+        AlternateAccess alternateAccess = null;
 
-		StringBuilder preArrayIndexItemId = new StringBuilder(objectReference.get(1));
-		preArrayIndexItemId.append("$");
-		preArrayIndexItemId.append(fc);
+        StringBuilder preArrayIndexItemId = new StringBuilder(objectReference.get(1));
+        preArrayIndexItemId.append("$");
+        preArrayIndexItemId.append(fc);
 
-		int arrayIndexPosition = objectReference.getArrayIndexPosition();
-		if (arrayIndexPosition != -1) {
+        int arrayIndexPosition = objectReference.getArrayIndexPosition();
+        if (arrayIndexPosition != -1) {
 
-			for (int i = 2; i < arrayIndexPosition; i++) {
-				preArrayIndexItemId.append("$");
-				preArrayIndexItemId.append(objectReference.get(i));
-			}
+            for (int i = 2; i < arrayIndexPosition; i++) {
+                preArrayIndexItemId.append("$");
+                preArrayIndexItemId.append(objectReference.get(i));
+            }
 
-			List<AlternateAccess.SubChoice> subSeqOfAlternateAccess = new ArrayList<AlternateAccess.SubChoice>();
-			BerInteger indexBerInteger = new BerInteger(Integer.parseInt(objectReference.get(arrayIndexPosition)));
+            List<AlternateAccess.SubChoice> subSeqOfAlternateAccess = new ArrayList<AlternateAccess.SubChoice>();
+            BerInteger indexBerInteger = new BerInteger(Integer.parseInt(objectReference.get(arrayIndexPosition)));
 
-			if (arrayIndexPosition < (objectReference.size() - 1)) {
-				// this reference points to a subnode of an array element
+            if (arrayIndexPosition < (objectReference.size() - 1)) {
+                // this reference points to a subnode of an array element
 
-				StringBuilder postArrayIndexItemId = new StringBuilder(objectReference.get(arrayIndexPosition + 1));
+                StringBuilder postArrayIndexItemId = new StringBuilder(objectReference.get(arrayIndexPosition + 1));
 
-				for (int i = (arrayIndexPosition + 2); i < objectReference.size(); i++) {
-					postArrayIndexItemId.append("$");
-					postArrayIndexItemId.append(objectReference.get(i));
-				}
+                for (int i = (arrayIndexPosition + 2); i < objectReference.size(); i++) {
+                    postArrayIndexItemId.append("$");
+                    postArrayIndexItemId.append(objectReference.get(i));
+                }
 
-				// component name is stored in an AlternateAccess
-				List<AlternateAccess.SubChoice> subSeqOf = new ArrayList<AlternateAccess.SubChoice>();
-				subSeqOf.add(new AlternateAccess.SubChoice(null, new BerVisibleString(postArrayIndexItemId.toString()
-						.getBytes()), null, null, null, null));
-				AlternateAccess subArrayEle = new AlternateAccess(subSeqOf);
+                // component name is stored in an AlternateAccess
+                List<AlternateAccess.SubChoice> subSeqOf = new ArrayList<AlternateAccess.SubChoice>();
+                subSeqOf.add(
+                        new AlternateAccess.SubChoice(null, new BerVisibleString(postArrayIndexItemId.toString().getBytes()), null, null,
+                                                      null, null));
+                AlternateAccess subArrayEle = new AlternateAccess(subSeqOf);
 
-				SubChoice_accessSelection accSel = new SubChoice_accessSelection(null, indexBerInteger, null, null);
-				SubSeq_selectAlternateAccess selectAltAcc = new SubSeq_selectAlternateAccess(accSel, subArrayEle);
+                SubChoice_accessSelection accSel = new SubChoice_accessSelection(null, indexBerInteger, null, null);
+                SubSeq_selectAlternateAccess selectAltAcc = new SubSeq_selectAlternateAccess(accSel, subArrayEle);
 
-				subSeqOfAlternateAccess.add(new AlternateAccess.SubChoice(selectAltAcc, null, null, null, null, null));
+                subSeqOfAlternateAccess.add(new AlternateAccess.SubChoice(selectAltAcc, null, null, null, null, null));
 
-			}
-			else {
-				subSeqOfAlternateAccess
-						.add(new AlternateAccess.SubChoice(null, null, indexBerInteger, null, null, null));
-			}
+            } else {
+                subSeqOfAlternateAccess.add(new AlternateAccess.SubChoice(null, null, indexBerInteger, null, null, null));
+            }
 
-			alternateAccess = new AlternateAccess(subSeqOfAlternateAccess);
+            alternateAccess = new AlternateAccess(subSeqOfAlternateAccess);
 
-		}
-		else {
+        } else {
 
-			for (int i = 2; i < objectReference.size(); i++) {
-				preArrayIndexItemId.append("$");
-				preArrayIndexItemId.append(objectReference.get(i));
-			}
-		}
+            for (int i = 2; i < objectReference.size(); i++) {
+                preArrayIndexItemId.append("$");
+                preArrayIndexItemId.append(objectReference.get(i));
+            }
+        }
 
-		ObjectName objectName = new ObjectName(null, new ObjectName.SubSeq_domain_specific(new BerVisibleString(
-				objectReference.get(0).getBytes()), new BerVisibleString(preArrayIndexItemId.toString().getBytes())),
-				null);
+        ObjectName objectName = new ObjectName(null, new ObjectName.SubSeq_domain_specific(
+                new BerVisibleString(objectReference.get(0).getBytes()), new BerVisibleString(preArrayIndexItemId.toString().getBytes())),
+                                               null);
 
-		VariableSpecification varSpec = new VariableSpecification(objectName);
+        VariableSpecification varSpec = new VariableSpecification(objectName);
 
-		variableDef = new VariableDef(varSpec, alternateAccess);
-		return variableDef;
-	}
+        variableDef = new VariableDef(varSpec, alternateAccess);
+        return variableDef;
+    }
 
 }

@@ -20,35 +20,35 @@
  */
 package org.openmuc.openiec61850.internal.scl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.openmuc.openiec61850.SclParseException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public final class LnType extends AbstractType {
 
-	// attributes not needed: lnClass, iedType
+    // attributes not needed: lnClass, iedType
 
-	public List<Do> dos = new ArrayList<Do>();
+    public List<Do> dos = new ArrayList<Do>();
 
-	public LnType(Node xmlNode) throws SclParseException {
+    public LnType(Node xmlNode) throws SclParseException {
 
-		super(xmlNode);
+        super(xmlNode);
 
-		if (xmlNode.getAttributes().getNamedItem("lnClass") == null) {
-			throw new SclParseException("Required attribute \"lnClass\" not found in LNType!");
-		}
+        if (xmlNode.getAttributes().getNamedItem("lnClass") == null) {
+            throw new SclParseException("Required attribute \"lnClass\" not found in LNType!");
+        }
 
-		NodeList elements = xmlNode.getChildNodes();
+        NodeList elements = xmlNode.getChildNodes();
 
-		for (int i = 0; i < elements.getLength(); i++) {
-			Node node = elements.item(i);
-			if (node.getNodeName().equals("DO")) {
-				dos.add(new Do(node));
-			}
-		}
-	}
+        for (int i = 0; i < elements.getLength(); i++) {
+            Node node = elements.item(i);
+            if (node.getNodeName().equals("DO")) {
+                dos.add(new Do(node));
+            }
+        }
+    }
 
 }

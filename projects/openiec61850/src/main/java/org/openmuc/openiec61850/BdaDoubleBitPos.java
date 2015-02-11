@@ -24,88 +24,83 @@ import java.util.Arrays;
 
 public final class BdaDoubleBitPos extends BdaBitString {
 
-	public enum DoubleBitPos {
-		INTERMEDIATE_STATE(0), OFF(1), ON(2), BAD_STATE(3);
-		private final int value;
+    public enum DoubleBitPos {
+        INTERMEDIATE_STATE(0), OFF(1), ON(2), BAD_STATE(3);
+        private final int value;
 
-		private DoubleBitPos(int value) {
-			this.value = value;
-		}
+        private DoubleBitPos(int value) {
+            this.value = value;
+        }
 
-		public int getIntValue() {
-			return value;
-		}
-	}
+        public int getIntValue() {
+            return value;
+        }
+    }
 
-	public BdaDoubleBitPos(ObjectReference objectReference, Fc fc, String sAddr, boolean dchg, boolean dupd) {
-		super(objectReference, fc, sAddr, 2, dchg, dupd);
-		basicType = BdaType.DOUBLE_BIT_POS;
-		setDefault();
-	}
+    public BdaDoubleBitPos(ObjectReference objectReference, Fc fc, String sAddr, boolean dchg, boolean dupd) {
+        super(objectReference, fc, sAddr, 2, dchg, dupd);
+        basicType = BdaType.DOUBLE_BIT_POS;
+        setDefault();
+    }
 
-	/**
-	 * Sets the value to DoubleBitPos.OFF
-	 */
-	@Override
-	public void setDefault() {
-		value = new byte[] { 0x40 };
-	}
+    /**
+     * Sets the value to DoubleBitPos.OFF
+     */
+    @Override
+    public void setDefault() {
+        value = new byte[]{0x40};
+    }
 
-	@Override
-	public BdaDoubleBitPos copy() {
-		BdaDoubleBitPos copy = new BdaDoubleBitPos(objectReference, fc, sAddr, dchg, dupd);
-		byte[] valueCopy = new byte[value.length];
-		System.arraycopy(value, 0, valueCopy, 0, value.length);
-		copy.setValue(valueCopy);
-		if (mirror == null) {
-			copy.mirror = this;
-		}
-		else {
-			copy.mirror = mirror;
-		}
-		return copy;
-	}
+    @Override
+    public BdaDoubleBitPos copy() {
+        BdaDoubleBitPos copy = new BdaDoubleBitPos(objectReference, fc, sAddr, dchg, dupd);
+        byte[] valueCopy = new byte[value.length];
+        System.arraycopy(value, 0, valueCopy, 0, value.length);
+        copy.setValue(valueCopy);
+        if (mirror == null) {
+            copy.mirror = this;
+        } else {
+            copy.mirror = mirror;
+        }
+        return copy;
+    }
 
-	public DoubleBitPos getDoubleBitPos() {
+    public DoubleBitPos getDoubleBitPos() {
 
-		if ((value[0] & 0xC0) == 0xC0) {
-			return DoubleBitPos.BAD_STATE;
-		}
+        if ((value[0] & 0xC0) == 0xC0) {
+            return DoubleBitPos.BAD_STATE;
+        }
 
-		if ((value[0] & 0x80) == 0x80) {
-			return DoubleBitPos.ON;
-		}
+        if ((value[0] & 0x80) == 0x80) {
+            return DoubleBitPos.ON;
+        }
 
-		if ((value[0] & 0x40) == 0x40) {
-			return DoubleBitPos.OFF;
-		}
+        if ((value[0] & 0x40) == 0x40) {
+            return DoubleBitPos.OFF;
+        }
 
-		return DoubleBitPos.INTERMEDIATE_STATE;
-	}
+        return DoubleBitPos.INTERMEDIATE_STATE;
+    }
 
-	public void setDoubleBitPos(DoubleBitPos doubleBitPos) {
-		if (doubleBitPos == DoubleBitPos.BAD_STATE) {
-			value[0] = (byte) 0xC0;
-		}
-		else if (doubleBitPos == DoubleBitPos.ON) {
-			value[0] = (byte) 0x80;
-		}
-		else if (doubleBitPos == DoubleBitPos.OFF) {
-			value[0] = (byte) 0x40;
-		}
-		else {
-			value[0] = (byte) 0;
-		}
-	}
+    public void setDoubleBitPos(DoubleBitPos doubleBitPos) {
+        if (doubleBitPos == DoubleBitPos.BAD_STATE) {
+            value[0] = (byte) 0xC0;
+        } else if (doubleBitPos == DoubleBitPos.ON) {
+            value[0] = (byte) 0x80;
+        } else if (doubleBitPos == DoubleBitPos.OFF) {
+            value[0] = (byte) 0x40;
+        } else {
+            value[0] = (byte) 0;
+        }
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof BdaDoubleBitPos) {
-			return Arrays.equals(value, ((BdaDoubleBitPos) obj).getValue());
-		}
-		else {
-			return false;
-		}
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof BdaDoubleBitPos) {
+            return Arrays.equals(value, ((BdaDoubleBitPos) obj).getValue());
+        } else {
+            return false;
+        }
+    }
 
 }

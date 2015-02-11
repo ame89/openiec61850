@@ -28,70 +28,69 @@ import org.openmuc.openiec61850.internal.mms.asn1.TypeSpecification;
 
 abstract public class BdaBitString extends BasicDataAttribute {
 
-	byte[] value;
-	final int maxNumBits;
+    byte[] value;
+    final int maxNumBits;
 
-	public BdaBitString(ObjectReference objectReference, Fc fc, String sAddr, int maxNumBits, boolean dchg, boolean dupd) {
-		super(objectReference, fc, sAddr, dchg, dupd);
-		this.maxNumBits = maxNumBits;
-	}
+    public BdaBitString(ObjectReference objectReference, Fc fc, String sAddr, int maxNumBits, boolean dchg, boolean dupd) {
+        super(objectReference, fc, sAddr, dchg, dupd);
+        this.maxNumBits = maxNumBits;
+    }
 
-	public byte[] getValue() {
-		return value;
-	}
+    public byte[] getValue() {
+        return value;
+    }
 
-	public void setValue(byte[] value) {
-		this.value = value;
-	}
+    public void setValue(byte[] value) {
+        this.value = value;
+    }
 
-	@Override
-	void setValueFrom(BasicDataAttribute bda) {
-		byte[] srcValue = ((BdaBitString) bda).getValue();
-		if (value.length != srcValue.length) {
-			value = new byte[srcValue.length];
-		}
-		System.arraycopy(srcValue, 0, value, 0, srcValue.length);
-	}
+    @Override
+    void setValueFrom(BasicDataAttribute bda) {
+        byte[] srcValue = ((BdaBitString) bda).getValue();
+        if (value.length != srcValue.length) {
+            value = new byte[srcValue.length];
+        }
+        System.arraycopy(srcValue, 0, value, 0, srcValue.length);
+    }
 
-	public int getMaxNumBits() {
-		return maxNumBits;
-	}
+    public int getMaxNumBits() {
+        return maxNumBits;
+    }
 
-	/**
-	 * Initializes BIT_STRING with all zeros
-	 */
-	@Override
-	public void setDefault() {
-		value = new byte[(maxNumBits / 8 + (((maxNumBits % 8) > 0) ? 1 : 0))];
-	}
+    /**
+     * Initializes BIT_STRING with all zeros
+     */
+    @Override
+    public void setDefault() {
+        value = new byte[(maxNumBits / 8 + (((maxNumBits % 8) > 0) ? 1 : 0))];
+    }
 
-	@Override
-	Data getMmsDataObj() {
-		return new Data(null, null, null, new BerBitString(value, maxNumBits), null, null, null, null, null, null,
-				null, null);
-	}
+    @Override
+    Data getMmsDataObj() {
+        return new Data(null, null, null, new BerBitString(value, maxNumBits), null, null, null, null, null, null, null, null);
+    }
 
-	@Override
-	void setValueFromMmsDataObj(Data data) throws ServiceError {
-		if (data.bit_string == null) {
-			throw new ServiceError(ServiceError.TYPE_CONFLICT, "expected type: bit_string");
-		}
-		if (data.bit_string.numBits > maxNumBits) {
-			throw new ServiceError(ServiceError.TYPE_CONFLICT, objectReference
-					+ ": bit_string is bigger than maxNumBits: " + data.bit_string.numBits + ">" + maxNumBits);
-		}
-		value = data.bit_string.bitString;
-	}
+    @Override
+    void setValueFromMmsDataObj(Data data) throws ServiceError {
+        if (data.bit_string == null) {
+            throw new ServiceError(ServiceError.TYPE_CONFLICT, "expected type: bit_string");
+        }
+        if (data.bit_string.numBits > maxNumBits) {
+            throw new ServiceError(ServiceError.TYPE_CONFLICT,
+                                   objectReference + ": bit_string is bigger than maxNumBits: " + data.bit_string.numBits + ">" +
+                                           maxNumBits);
+        }
+        value = data.bit_string.bitString;
+    }
 
-	@Override
-	TypeSpecification getMmsTypeSpec() {
-		return new TypeSpecification(null, null, null, new BerInteger(maxNumBits * -1), null, null, null, null, null,
-				null, null, null);
-	}
+    @Override
+    TypeSpecification getMmsTypeSpec() {
+        return new TypeSpecification(null, null, null, new BerInteger(maxNumBits * -1), null, null, null, null, null, null, null, null);
+    }
 
-	@Override
-	public String toString() {
-		return getReference().toString() + ": " + value;
-	}
+    @Override
+    public String toString() {
+        return getReference().toString() + ": " + value;
+    }
 
 }

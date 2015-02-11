@@ -1,130 +1,142 @@
-
 def projectName = 'OpenIEC61850'
 def projectNameLowerCase = 'openiec61850'
 
 configure(allprojects) {
-  apply plugin: 'java'
-  version = '1.1.0'
-  group = 'org.openmuc'
+    apply plugin: 'java'
+    version = '1.1.1'
+    group = 'org.openmuc'
+}
+
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.encoding = "UTF-8"
+            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        }
+    }
+
+    javadoc {
+        options.encoding = "UTF-8"
+    }
 }
 
 project.ext {
-  distributionProjects = subprojects.findAll {
-    it.getPath() == ':openiec61850' ||
-    it.getPath() == ':openiec61850-sample' ||
-    it.getPath() == ':openiec61850-clientgui' ||
-    it.getPath() == ':josistack' ||
-    it.getPath() == ':jositransport'
-  }
+    distributionProjects = subprojects.findAll {
+        it.getPath() == ':openiec61850' ||
+                it.getPath() == ':openiec61850-sample' ||
+                it.getPath() == ':openiec61850-clientgui' ||
+                it.getPath() == ':josistack' ||
+                it.getPath() == ':jositransport'
+    }
 
-  docProjects = distributionProjects.findAll {
-    it.getPath() == ':openiec61850'
-  }
+    docProjects = distributionProjects.findAll {
+        it.getPath() == ':openiec61850'
+    }
 
-  repositoryProjects = distributionProjects.findAll {
-    it.getPath() == ':openiec61850' ||
-    it.getPath() == ':openiec61850-clientgui' ||
-    it.getPath() == ':josistack' ||
-    it.getPath() == ':jositransport'
-  }
+    repositoryProjects = distributionProjects.findAll {
+        it.getPath() == ':openiec61850' ||
+                it.getPath() == ':openiec61850-clientgui' ||
+                it.getPath() == ':josistack' ||
+                it.getPath() == ':jositransport'
+    }
 }
 
 configure(subprojects) {
 
-  apply plugin: 'eclipse'
-  apply plugin: 'osgi'
-  apply plugin: 'maven'
-  apply plugin: 'signing'
+    apply plugin: 'eclipse'
+    apply plugin: 'osgi'
+    apply plugin: 'maven'
+    apply plugin: 'signing'
 
-  sourceCompatibility = 1.6
-  targetCompatibility = 1.6
+    sourceCompatibility = 1.6
+    targetCompatibility = 1.6
 
-  repositories {
-    mavenCentral()
-    flatDir {
-      dirs 'dependencies', rootDir.getPath() + "/dependencies"
+    repositories {
+        mavenCentral()
+        flatDir {
+            dirs 'dependencies', rootDir.getPath() + "/dependencies"
+        }
     }
-  }
 
-  jar {
-    manifest {
-      version = project.version.replace('-','.');
+    jar {
+        manifest {
+            version = project.version.replace('-', '.');
+        }
     }
-  }
 
-  dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.11'
-  }
+    dependencies {
+        testCompile group: 'junit', name: 'junit', version: '4.11'
+    }
 
-  task copyLibs(type: Copy) {
-    dependsOn(configurations.default.getAllArtifacts().getBuildDependencies())
+    task copyLibs(type: Copy) {
+        dependsOn(configurations.default.getAllArtifacts().getBuildDependencies())
 
-    into rootDir.getPath() + "/build/libsdeps"
-    from configurations.default
-    from configurations.default.getAllArtifacts().getFiles()
-  }
+        into rootDir.getPath() + "/build/libsdeps"
+        from configurations.default
+        from configurations.default.getAllArtifacts().getFiles()
+    }
 
-  build.dependsOn(copyLibs)
+    build.dependsOn(copyLibs)
 
-  eclipse.pathVariables([GRADLE_USER_HOME:file(gradle.gradleUserHomeDir)])
-  tasks.eclipse.dependsOn(cleanEclipse)
+    eclipse.pathVariables([GRADLE_USER_HOME: file(gradle.gradleUserHomeDir)])
+    tasks.eclipse.dependsOn(cleanEclipse)
 }
 
 configure(repositoryProjects) {
 
-  signing {
-    if ( project.hasProperty('signing.keyId') ) {
-      sign configurations.archives
+    signing {
+        if (project.hasProperty('signing.keyId')) {
+            sign configurations.archives
+        }
     }
-  }
 
-  task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-  }
-
-  task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-  }
-
-  artifacts {
-    archives sourcesJar
-    archives javadocJar
-  }
-
-  javadoc {
-    exclude '**/internal/**'
-  }
-
-  uploadArchives {
-    repositories {
-      mavenDeployer {
-	beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-	repository(url: project.properties.sonatypeRepository) {
-	  authentication(userName: project.properties.sonatypeUser, password: project.properties.sonatypePass)
-	}
-	snapshotRepository(url: project.properties.sonatypeSnapshotRepository) {
-	  authentication(userName: project.properties.sonatypeUser, password: project.properties.sonatypePass)
-	}
-	
-	pom.project {
-	  scm {
-	    url 'none'
-	    connection 'none'
-	  }
-
-	  developers {
-	    developer {
-	      id 'sfeuerhahn'
-	      name 'Stefan Feuerhahn'
-	    }
-	  }
-	}
-      }
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
     }
-  }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    artifacts {
+        archives sourcesJar
+        archives javadocJar
+    }
+
+    javadoc {
+        exclude '**/internal/**'
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+                repository(url: project.properties.sonatypeRepository) {
+                    authentication(userName: project.properties.sonatypeUser, password: project.properties.sonatypePass)
+                }
+                snapshotRepository(url: project.properties.sonatypeSnapshotRepository) {
+                    authentication(userName: project.properties.sonatypeUser, password: project.properties.sonatypePass)
+                }
+
+                pom.project {
+                    scm {
+                        url 'none'
+                        connection 'none'
+                    }
+
+                    developers {
+                        developer {
+                            id 'sfeuerhahn'
+                            name 'Stefan Feuerhahn'
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 }
 
@@ -132,105 +144,106 @@ jar.enabled = false
 uploadArchives.enabled = false
 
 configure(docProjects) {
-  task copySrc(type: Copy) {
-    dependsOn(sourcesJar)
-    into rootDir.getPath() + "/build/libsdeps"
-    from configurations.archives.getAllArtifacts().getFiles()
-  }
-  copyLibs.dependsOn copySrc
+    task copySrc(type: Copy) {
+        dependsOn(sourcesJar)
+        into rootDir.getPath() + "/build/libsdeps"
+        from configurations.archives.getAllArtifacts().getFiles()
+    }
+    copyLibs.dependsOn copySrc
 }
 
 task javadocs(type: Javadoc) {
 
-  source docProjects.collect {
-    project -> project.sourceSets.main.allJava
-  }
+    source docProjects.collect {
+        project -> project.sourceSets.main.allJava
+    }
 
-  exclude '**/internal/**'
+    exclude '**/internal/**'
 
-  destinationDir = new File(buildDir, 'javadoc')
+    destinationDir = new File(buildDir, 'javadoc')
 
-  classpath = files(distributionProjects.collect { project ->
-    project.sourceSets.main.compileClasspath })
+    classpath = files(distributionProjects.collect { project ->
+        project.sourceSets.main.compileClasspath
+    })
 
-  classpath += files(distributionProjects.collect { project ->
-    project.sourceSets.main.output })
+    classpath += files(distributionProjects.collect { project ->
+        project.sourceSets.main.output
+    })
 }
 
 task writeSettings << {
-  Writer out = new OutputStreamWriter(new FileOutputStream("build/settings.gradle"));
-  out.write("include ");
-  boolean first = true;
-  for (Project myproject: distributionProjects) {
-    if (first == true) {
-      first = false;
+    Writer out = new OutputStreamWriter(new FileOutputStream("build/settings.gradle"));
+    out.write("include ");
+    boolean first = true;
+    for (Project myproject : distributionProjects) {
+        if (first == true) {
+            first = false;
+        } else {
+            out.write ", ";
+        }
+        out.write "'" + myproject.name + "'"
     }
-    else {
-      out.write ", ";
+    out.write "\n\n";
+
+    for (Project myproject : distributionProjects) {
+        out.write 'project(":' + myproject.name + '").projectDir = file("' + myproject.getProjectDir().toString().substring((int) (getProjectDir().toString().size() + 1)) + '")\n';
     }
-    out.write "'" + myproject.name + "'"
-  }
-  out .write "\n\n";
 
-  for (Project myproject: distributionProjects) {
-    out.write 'project(":' + myproject.name + '").projectDir = file("' + myproject.getProjectDir().toString().substring((int)(getProjectDir().toString().size() + 1)) + '")\n';
-  }
-
-  out.close();
+    out.close();
 }
 
 task buildDistProjects {
-  dependsOn(distributionProjects.build)
+    dependsOn(distributionProjects.build)
 }
 
-task (tar, type: Tar) {
-  dependsOn(writeSettings)
-  dependsOn(distributionProjects.build)
-  dependsOn(javadocs)
+task(tar, type: Tar) {
+    dependsOn(writeSettings)
+    dependsOn(distributionProjects.build)
+    dependsOn(javadocs)
 
-  compression = Compression.GZIP
+    compression = Compression.GZIP
 
-  into(project.archivesBaseName) {
-    from('./') {
-      include 'build.gradle'
-      include 'licenses/**'
-      include 'doc/*.txt'
-      include 'doc/userguide/' + projectNameLowerCase + '-doc*.html'
-      include 'doc/userguide/' + projectNameLowerCase + '-doc_img/**'
-      include 'build/libsdeps/**'
-      include 'build/javadoc/**'
+    into(project.archivesBaseName) {
+        from('./') {
+            include 'build.gradle'
+            include 'licenses/**'
+            include 'doc/*.txt'
+            include 'doc/userguide/' + projectNameLowerCase + '-doc*.html'
+            include 'doc/userguide/' + projectNameLowerCase + '-doc_img/**'
+            include 'build/libsdeps/**'
+            include 'build/javadoc/**'
 
-      include 'runscripts/**'
+            include 'run-scripts/**'
 
-      include 'projects/openiec61850/src/**'
-      include 'projects/openiec61850/build.gradle'
-      include 'projects/openiec61850/dependencies/**'
-      include 'projects/openiec61850/asn1/**'
-      include 'projects/openiec61850/build/docs/**'
+            include 'projects/openiec61850/src/**'
+            include 'projects/openiec61850/build.gradle'
+            include 'projects/openiec61850/dependencies/**'
+            include 'projects/openiec61850/asn1/**'
+            include 'projects/openiec61850/build/docs/**'
 
-      include 'projects/sample/src/**'
-      include 'projects/sample/build.gradle'
-      include 'projects/sample/sampleServer/**'
-      include 'projects/sample/sampleClient/**'
+            include 'projects/sample/src/**'
+            include 'projects/sample/build.gradle'
+            include 'projects/sample/sampleServer/**'
+            include 'projects/sample/sampleClient/**'
 
-      include 'projects/clientgui/src/**'
-      include 'projects/clientgui/build.gradle'
+            include 'projects/clientgui/src/**'
+            include 'projects/clientgui/build.gradle'
 
-      include 'projects/josistack/src/**'
-      include 'projects/josistack/build.gradle'
-      include 'projects/josistack/dependencies/**'
-      include 'projects/josistack/asn1/**'
-      include 'projects/josistack/build/docs/**'
+            include 'projects/josistack/src/**'
+            include 'projects/josistack/build.gradle'
+            include 'projects/josistack/dependencies/**'
+            include 'projects/josistack/asn1/**'
+            include 'projects/josistack/build/docs/**'
 
-      include 'projects/jositransport/src/**'
-      include 'projects/jositransport/build.gradle'
-      include 'projects/jositransport/doc/**'
-      include 'projects/jositransport/sample/**'
-      include 'projects/jositransport/build/docs/**'
+            include 'projects/jositransport/src/**'
+            include 'projects/jositransport/build.gradle'
+            include 'projects/jositransport/doc/**'
+            include 'projects/jositransport/sample/**'
+            include 'projects/jositransport/build/docs/**'
+        }
+
+        from('./build/') {
+            include 'settings.gradle'
+        }
     }
-
-    from('./build/') {
-      include 'settings.gradle'
-    }
-  }
 }

@@ -20,28 +20,28 @@
  */
 package org.openmuc.openiec61850;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
 import org.openmuc.josistack.AcseAssociation;
 import org.openmuc.josistack.AcseAssociationListener;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+
 final class AcseListener implements AcseAssociationListener {
 
-	ServerSap serverSap;
+    ServerSap serverSap;
 
-	AcseListener(ServerSap serverSap) {
-		this.serverSap = serverSap;
-	}
+    AcseListener(ServerSap serverSap) {
+        this.serverSap = serverSap;
+    }
 
-	@Override
-	public void connectionIndication(AcseAssociation acseAssociation, ByteBuffer psdu) {
-		serverSap.connectionIndication(acseAssociation, psdu);
-	}
+    @Override
+    public void connectionIndication(AcseAssociation acseAssociation, ByteBuffer psdu) {
+        serverSap.connectionIndication(acseAssociation, psdu);
+    }
 
-	@Override
-	public void serverStoppedListeningIndication(IOException e) {
-		serverSap.serverStoppedListeningIndication(e);
-	}
+    @Override
+    public void serverStoppedListeningIndication(IOException e) {
+        serverSap.serverStoppedListeningIndication(e);
+    }
 
 }

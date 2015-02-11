@@ -26,27 +26,27 @@ import org.w3c.dom.Node;
 
 public final class Sdo extends AbstractElement {
 
-	private String type = null;
+    private String type = null;
 
-	public Sdo(String name, String desc, DoType type) {
-		super(name, desc);
-	}
+    public Sdo(String name, String desc, DoType type) {
+        super(name, desc);
+    }
 
-	public Sdo(Node xmlNode) throws SclParseException {
-		super(xmlNode);
+    public Sdo(Node xmlNode) throws SclParseException {
+        super(xmlNode);
 
-		NamedNodeMap attributes = xmlNode.getAttributes();
+        NamedNodeMap attributes = xmlNode.getAttributes();
 
-		Node node = attributes.getNamedItem("type");
+        Node node = attributes.getNamedItem("type");
 
-		if (node == null) {
-			throw new SclParseException("Required attribute \"type\" not found!");
-		}
+        if (node == null) {
+            throw new SclParseException("Required attribute \"type\" not found!");
+        }
 
-		type = node.getNodeValue();
-	}
+        type = node.getNodeValue();
+    }
 
-	public String getType() {
-		return type;
-	}
+    public String getType() {
+        return type;
+    }
 }

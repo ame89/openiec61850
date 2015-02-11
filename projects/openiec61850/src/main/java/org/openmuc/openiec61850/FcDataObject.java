@@ -20,13 +20,13 @@
  */
 package org.openmuc.openiec61850;
 
+import org.openmuc.openiec61850.internal.mms.asn1.Data;
+import org.openmuc.openiec61850.internal.mms.asn1.DataSequence;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-
-import org.openmuc.openiec61850.internal.mms.asn1.Data;
-import org.openmuc.openiec61850.internal.mms.asn1.DataSequence;
 
 /**
  * This class represents a functionally constraint DataObject. That means it has unique reference and
@@ -35,64 +35,61 @@ import org.openmuc.openiec61850.internal.mms.asn1.DataSequence;
  * FcDataObject, Array, ConstructedDataAttribute or BasicDataAttribute.
  *
  * @author Stefan Feuerhahn
- *
  */
 public class FcDataObject extends FcModelNode {
 
-	public FcDataObject(ObjectReference objectReference, Fc fc, List<FcModelNode> children) {
+    public FcDataObject(ObjectReference objectReference, Fc fc, List<FcModelNode> children) {
 
-		this.children = new LinkedHashMap<String, ModelNode>((int) ((children.size() / 0.75) + 1));
-		this.objectReference = objectReference;
-		for (ModelNode child : children) {
-			this.children.put(child.getReference().getName(), child);
-			child.setParent(this);
-		}
-		this.fc = fc;
-	}
+        this.children = new LinkedHashMap<String, ModelNode>((int) ((children.size() / 0.75) + 1));
+        this.objectReference = objectReference;
+        for (ModelNode child : children) {
+            this.children.put(child.getReference().getName(), child);
+            child.setParent(this);
+        }
+        this.fc = fc;
+    }
 
-	@Override
-	public FcDataObject copy() {
-		List<FcModelNode> childCopies = new ArrayList<FcModelNode>(children.size());
-		for (ModelNode childNode : children.values()) {
-			childCopies.add((FcModelNode) childNode.copy());
-		}
-		return new FcDataObject(objectReference, fc, childCopies);
-	}
+    @Override
+    public FcDataObject copy() {
+        List<FcModelNode> childCopies = new ArrayList<FcModelNode>(children.size());
+        for (ModelNode childNode : children.values()) {
+            childCopies.add((FcModelNode) childNode.copy());
+        }
+        return new FcDataObject(objectReference, fc, childCopies);
+    }
 
-	@Override
-	Data getMmsDataObj() {
-		ArrayList<Data> seq = new ArrayList<Data>(children.size());
-		for (ModelNode modelNode : getChildren()) {
-			Data child = modelNode.getMmsDataObj();
-			if (child == null) {
-				throw new IllegalArgumentException("Unable to convert Child: " + modelNode.objectReference
-						+ " to MMS Data Object.");
-			}
-			seq.add(child);
-		}
-		if (seq.size() == 0) {
-			throw new IllegalArgumentException("Converting ModelNode: " + objectReference
-					+ " to MMS Data Object resulted in Sequence of size zero.");
-		}
+    @Override
+    Data getMmsDataObj() {
+        ArrayList<Data> seq = new ArrayList<Data>(children.size());
+        for (ModelNode modelNode : getChildren()) {
+            Data child = modelNode.getMmsDataObj();
+            if (child == null) {
+                throw new IllegalArgumentException("Unable to convert Child: " + modelNode.objectReference + " to MMS Data Object.");
+            }
+            seq.add(child);
+        }
+        if (seq.size() == 0) {
+            throw new IllegalArgumentException(
+                    "Converting ModelNode: " + objectReference + " to MMS Data Object resulted in Sequence of size zero.");
+        }
 
-		return new Data(null, new DataSequence(seq), null, null, null, null, null, null, null, null, null, null);
+        return new Data(null, new DataSequence(seq), null, null, null, null, null, null, null, null, null, null);
 
-	}
+    }
 
-	@Override
-	void setValueFromMmsDataObj(Data data) throws ServiceError {
-		if (data.structure == null) {
-			throw new ServiceError(ServiceError.TYPE_CONFLICT, "expected type: structure");
-		}
-		if (data.structure.seqOf.size() != children.size()) {
-			throw new ServiceError(ServiceError.TYPE_CONFLICT, "expected type: structure with " + children.size()
-					+ " elements");
-		}
+    @Override
+    void setValueFromMmsDataObj(Data data) throws ServiceError {
+        if (data.structure == null) {
+            throw new ServiceError(ServiceError.TYPE_CONFLICT, "expected type: structure");
+        }
+        if (data.structure.seqOf.size() != children.size()) {
+            throw new ServiceError(ServiceError.TYPE_CONFLICT, "expected type: structure with " + children.size() + " elements");
+        }
 
-		Iterator<Data> iterator = data.structure.seqOf.iterator();
-		for (ModelNode child : children.values()) {
-			child.setValueFromMmsDataObj(iterator.next());
-		}
-	}
+        Iterator<Data> iterator = data.structure.seqOf.iterator();
+        for (ModelNode child : children.values()) {
+            child.setValueFromMmsDataObj(iterator.next());
+        }
+    }
 
 }

@@ -20,13 +20,6 @@
  */
 package org.openmuc.openiec61850;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.openmuc.jasn1.ber.types.string.BerVisibleString;
 import org.openmuc.openiec61850.internal.mms.asn1.Data;
 import org.openmuc.openiec61850.internal.mms.asn1.StructComponent;
@@ -34,134 +27,132 @@ import org.openmuc.openiec61850.internal.mms.asn1.TypeSpecification;
 import org.openmuc.openiec61850.internal.mms.asn1.TypeSpecification.SubSeq_structure;
 import org.openmuc.openiec61850.internal.mms.asn1.TypeSpecification.SubSeq_structure.SubSeqOf_components;
 
+import java.util.*;
+
 public abstract class ModelNode implements Iterable<ModelNode> {
 
-	protected ObjectReference objectReference;
-	protected Map<String, ModelNode> children;
-	ModelNode parent;
+    protected ObjectReference objectReference;
+    protected Map<String, ModelNode> children;
+    ModelNode parent;
 
-	/**
-	 * Returns a copy of model node with all of its children. Creates new BasicDataAttribute values but reuses
-	 * ObjectReferences, FunctionalConstraints.
-	 *
-	 * @return a copy of model node with all of its children.
-	 */
-	public abstract ModelNode copy();
+    /**
+     * Returns a copy of model node with all of its children. Creates new BasicDataAttribute values but reuses
+     * ObjectReferences, FunctionalConstraints.
+     *
+     * @return a copy of model node with all of its children.
+     */
+    public abstract ModelNode copy();
 
-	/**
-	 * Returns the child node with the given name. Will always return null if called on a logical node because a logical
-	 * node need the functional constraint to uniquely identify a child. For logical nodes use
-	 * <code>getChild(String name, Fc fc)</code> instead.
-	 *
-	 * @param name
-	 *            the name of the requested child node
-	 * @return the child node with the given name.
-	 */
-	public ModelNode getChild(String name) {
-		return getChild(name, null);
-	}
+    /**
+     * Returns the child node with the given name. Will always return null if called on a logical node because a logical
+     * node need the functional constraint to uniquely identify a child. For logical nodes use
+     * <code>getChild(String name, Fc fc)</code> instead.
+     *
+     * @param name the name of the requested child node
+     * @return the child node with the given name.
+     */
+    public ModelNode getChild(String name) {
+        return getChild(name, null);
+    }
 
-	/**
-	 * Returns the child node with the given name and functional constraint. The fc is ignored if this function is
-	 * called on any model node other than logical node.
-	 *
-	 * @param name
-	 *            the name of the requested child node
-	 * @param fc
-	 *            the functional constraint of the requested child node
-	 * @return the child node with the given name and functional constrain
-	 */
-	public ModelNode getChild(String name, Fc fc) {
-		return children.get(name);
-	}
+    /**
+     * Returns the child node with the given name and functional constraint. The fc is ignored if this function is
+     * called on any model node other than logical node.
+     *
+     * @param name the name of the requested child node
+     * @param fc   the functional constraint of the requested child node
+     * @return the child node with the given name and functional constrain
+     */
+    public ModelNode getChild(String name, Fc fc) {
+        return children.get(name);
+    }
 
-	@SuppressWarnings("unchecked")
-	public Collection<ModelNode> getChildren() {
-		if (children == null) {
-			return null;
-		}
-		return (Collection<ModelNode>) ((Collection<?>) children.values());
-	}
+    @SuppressWarnings("unchecked")
+    public Collection<ModelNode> getChildren() {
+        if (children == null) {
+            return null;
+        }
+        return (Collection<ModelNode>) ((Collection<?>) children.values());
+    }
 
-	protected Iterator<Iterator<? extends ModelNode>> getIterators() {
-		List<Iterator<? extends ModelNode>> iterators = new ArrayList<Iterator<? extends ModelNode>>();
-		if (children != null) {
-			iterators.add(children.values().iterator());
-		}
-		return iterators.iterator();
-	}
+    protected Iterator<Iterator<? extends ModelNode>> getIterators() {
+        List<Iterator<? extends ModelNode>> iterators = new ArrayList<Iterator<? extends ModelNode>>();
+        if (children != null) {
+            iterators.add(children.values().iterator());
+        }
+        return iterators.iterator();
+    }
 
-	/**
-	 * Returns the reference of the model node.
-	 *
-	 * @return the reference of the model node.
-	 */
-	public ObjectReference getReference() {
-		return objectReference;
-	}
+    /**
+     * Returns the reference of the model node.
+     *
+     * @return the reference of the model node.
+     */
+    public ObjectReference getReference() {
+        return objectReference;
+    }
 
-	/**
-	 * Returns the name of the model node.
-	 *
-	 * @return the name of the model node.
-	 */
-	public String getName() {
-		return objectReference.getName();
-	}
+    /**
+     * Returns the name of the model node.
+     *
+     * @return the name of the model node.
+     */
+    public String getName() {
+        return objectReference.getName();
+    }
 
-	@Override
-	public Iterator<ModelNode> iterator() {
-		return children.values().iterator();
-	}
+    @Override
+    public Iterator<ModelNode> iterator() {
+        return children.values().iterator();
+    }
 
-	/**
-	 * Returns a list of all leaf nodes (basic data attributes) contained in the subtree of this model node.
-	 *
-	 * @return a list of all leaf nodes (basic data attributes) contained in the subtree of this model node.
-	 */
-	public List<BasicDataAttribute> getBasicDataAttributes() {
-		List<BasicDataAttribute> subBasicDataAttributes = new LinkedList<BasicDataAttribute>();
-		for (ModelNode child : children.values()) {
-			subBasicDataAttributes.addAll(child.getBasicDataAttributes());
-		}
-		return subBasicDataAttributes;
-	}
+    /**
+     * Returns a list of all leaf nodes (basic data attributes) contained in the subtree of this model node.
+     *
+     * @return a list of all leaf nodes (basic data attributes) contained in the subtree of this model node.
+     */
+    public List<BasicDataAttribute> getBasicDataAttributes() {
+        List<BasicDataAttribute> subBasicDataAttributes = new LinkedList<BasicDataAttribute>();
+        for (ModelNode child : children.values()) {
+            subBasicDataAttributes.addAll(child.getBasicDataAttributes());
+        }
+        return subBasicDataAttributes;
+    }
 
-	@Override
-	public String toString() {
-		return getReference().toString();
-	}
+    @Override
+    public String toString() {
+        return getReference().toString();
+    }
 
-	void setParent(ModelNode parent) {
-		this.parent = parent;
-	}
+    void setParent(ModelNode parent) {
+        this.parent = parent;
+    }
 
-	/**
-	 * Returns the parent node of this node.
-	 *
-	 * @return the parent node of this node.
-	 */
-	public ModelNode getParent() {
-		return parent;
-	}
+    /**
+     * Returns the parent node of this node.
+     *
+     * @return the parent node of this node.
+     */
+    public ModelNode getParent() {
+        return parent;
+    }
 
-	Data getMmsDataObj() {
-		return null;
-	}
+    Data getMmsDataObj() {
+        return null;
+    }
 
-	void setValueFromMmsDataObj(Data data) throws ServiceError {
-	}
+    void setValueFromMmsDataObj(Data data) throws ServiceError {
+    }
 
-	TypeSpecification getMmsTypeSpec() {
-		List<StructComponent> structComponents = new LinkedList<StructComponent>();
-		for (ModelNode child : children.values()) {
-			structComponents.add(new StructComponent(new BerVisibleString(child.getName().getBytes()), child
-					.getMmsTypeSpec()));
-		}
-		SubSeqOf_components componentsSequenceType = new SubSeqOf_components(structComponents);
-		SubSeq_structure structure = new SubSeq_structure(null, componentsSequenceType);
+    TypeSpecification getMmsTypeSpec() {
+        List<StructComponent> structComponents = new LinkedList<StructComponent>();
+        for (ModelNode child : children.values()) {
+            structComponents.add(new StructComponent(new BerVisibleString(child.getName().getBytes()), child.getMmsTypeSpec()));
+        }
+        SubSeqOf_components componentsSequenceType = new SubSeqOf_components(structComponents);
+        SubSeq_structure structure = new SubSeq_structure(null, componentsSequenceType);
 
-		return new TypeSpecification(null, structure, null, null, null, null, null, null, null, null, null, null);
-	}
+        return new TypeSpecification(null, structure, null, null, null, null, null, null, null, null, null, null);
+    }
 
 }

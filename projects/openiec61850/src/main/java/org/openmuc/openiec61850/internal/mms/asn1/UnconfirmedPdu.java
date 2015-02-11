@@ -4,99 +4,97 @@
 
 package org.openmuc.openiec61850.internal.mms.asn1;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import org.openmuc.jasn1.ber.BerByteArrayOutputStream;
 import org.openmuc.jasn1.ber.BerIdentifier;
 import org.openmuc.jasn1.ber.BerLength;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 public final class UnconfirmedPdu {
 
-	public final static BerIdentifier identifier = new BerIdentifier(BerIdentifier.UNIVERSAL_CLASS,
-			BerIdentifier.CONSTRUCTED, 16);
-	protected BerIdentifier id;
+    public final static BerIdentifier identifier = new BerIdentifier(BerIdentifier.UNIVERSAL_CLASS, BerIdentifier.CONSTRUCTED, 16);
+    protected BerIdentifier id;
 
-	public byte[] code = null;
-	public UnconfirmedService unconfirmedService = null;
+    public byte[] code = null;
+    public UnconfirmedService unconfirmedService = null;
 
-	public UnconfirmedPdu() {
-		id = identifier;
-	}
+    public UnconfirmedPdu() {
+        id = identifier;
+    }
 
-	public UnconfirmedPdu(byte[] code) {
-		id = identifier;
-		this.code = code;
-	}
+    public UnconfirmedPdu(byte[] code) {
+        id = identifier;
+        this.code = code;
+    }
 
-	public UnconfirmedPdu(UnconfirmedService unconfirmedService) {
-		id = identifier;
-		this.unconfirmedService = unconfirmedService;
-	}
+    public UnconfirmedPdu(UnconfirmedService unconfirmedService) {
+        id = identifier;
+        this.unconfirmedService = unconfirmedService;
+    }
 
-	public int encode(BerByteArrayOutputStream berOStream, boolean explicit) throws IOException {
+    public int encode(BerByteArrayOutputStream berOStream, boolean explicit) throws IOException {
 
-		int codeLength;
+        int codeLength;
 
-		if (code != null) {
-			codeLength = code.length;
-			for (int i = code.length - 1; i >= 0; i--) {
-				berOStream.write(code[i]);
-			}
-		}
-		else {
-			codeLength = 0;
-			codeLength += unconfirmedService.encode(berOStream, true);
+        if (code != null) {
+            codeLength = code.length;
+            for (int i = code.length - 1; i >= 0; i--) {
+                berOStream.write(code[i]);
+            }
+        } else {
+            codeLength = 0;
+            codeLength += unconfirmedService.encode(berOStream, true);
 
-			codeLength += BerLength.encodeLength(berOStream, codeLength);
-		}
+            codeLength += BerLength.encodeLength(berOStream, codeLength);
+        }
 
-		if (explicit) {
-			codeLength += id.encode(berOStream);
-		}
+        if (explicit) {
+            codeLength += id.encode(berOStream);
+        }
 
-		return codeLength;
+        return codeLength;
 
-	}
+    }
 
-	public int decode(InputStream iStream, boolean explicit) throws IOException {
-		int codeLength = 0;
-		int subCodeLength = 0;
-		int choiceDecodeLength = 0;
-		BerIdentifier berIdentifier = new BerIdentifier();
-		boolean decodedIdentifier = false;
+    public int decode(InputStream iStream, boolean explicit) throws IOException {
+        int codeLength = 0;
+        int subCodeLength = 0;
+        int choiceDecodeLength = 0;
+        BerIdentifier berIdentifier = new BerIdentifier();
+        boolean decodedIdentifier = false;
 
-		if (explicit) {
-			codeLength += id.decodeAndCheck(iStream);
-		}
+        if (explicit) {
+            codeLength += id.decodeAndCheck(iStream);
+        }
 
-		BerLength length = new BerLength();
-		codeLength += length.decode(iStream);
+        BerLength length = new BerLength();
+        codeLength += length.decode(iStream);
 
-		if (subCodeLength < length.val) {
-			if (decodedIdentifier == false) {
-				subCodeLength += berIdentifier.decode(iStream);
-				decodedIdentifier = true;
-			}
-			unconfirmedService = new UnconfirmedService();
-			choiceDecodeLength = unconfirmedService.decode(iStream, berIdentifier);
-			if (choiceDecodeLength != 0) {
-				decodedIdentifier = false;
-				subCodeLength += choiceDecodeLength;
-			}
-		}
-		if (subCodeLength != length.val) {
-			throw new IOException("Decoded sequence has wrong length tag");
+        if (subCodeLength < length.val) {
+            if (decodedIdentifier == false) {
+                subCodeLength += berIdentifier.decode(iStream);
+                decodedIdentifier = true;
+            }
+            unconfirmedService = new UnconfirmedService();
+            choiceDecodeLength = unconfirmedService.decode(iStream, berIdentifier);
+            if (choiceDecodeLength != 0) {
+                decodedIdentifier = false;
+                subCodeLength += choiceDecodeLength;
+            }
+        }
+        if (subCodeLength != length.val) {
+            throw new IOException("Decoded sequence has wrong length tag");
 
-		}
-		codeLength += subCodeLength;
+        }
+        codeLength += subCodeLength;
 
-		return codeLength;
-	}
+        return codeLength;
+    }
 
-	public void encodeAndSave(int encodingSizeGuess) throws IOException {
-		BerByteArrayOutputStream berOStream = new BerByteArrayOutputStream(encodingSizeGuess);
-		encode(berOStream, false);
-		code = berOStream.getArray();
-	}
+    public void encodeAndSave(int encodingSizeGuess) throws IOException {
+        BerByteArrayOutputStream berOStream = new BerByteArrayOutputStream(encodingSizeGuess);
+        encode(berOStream, false);
+        code = berOStream.getArray();
+    }
 }

@@ -27,76 +27,73 @@ import org.openmuc.openiec61850.internal.mms.asn1.TypeSpecification;
 
 public final class BdaInt32U extends BasicDataAttribute {
 
-	private long value;
+    private long value;
 
-	public BdaInt32U(ObjectReference objectReference, Fc fc, String sAddr, boolean dchg, boolean dupd) {
-		super(objectReference, fc, sAddr, dchg, dupd);
-		basicType = BdaType.INT32U;
-		setDefault();
-	}
+    public BdaInt32U(ObjectReference objectReference, Fc fc, String sAddr, boolean dchg, boolean dupd) {
+        super(objectReference, fc, sAddr, dchg, dupd);
+        basicType = BdaType.INT32U;
+        setDefault();
+    }
 
-	public void setValue(long value) {
-		this.value = value;
-	}
+    public void setValue(long value) {
+        this.value = value;
+    }
 
-	@Override
-	void setValueFrom(BasicDataAttribute bda) {
-		value = ((BdaInt32U) bda).getValue();
-	}
+    @Override
+    void setValueFrom(BasicDataAttribute bda) {
+        value = ((BdaInt32U) bda).getValue();
+    }
 
-	public long getValue() {
-		return value;
-	}
+    public long getValue() {
+        return value;
+    }
 
-	@Override
-	public void setDefault() {
-		value = 0;
-	}
+    @Override
+    public void setDefault() {
+        value = 0;
+    }
 
-	@Override
-	public BdaInt32U copy() {
-		BdaInt32U copy = new BdaInt32U(objectReference, fc, sAddr, dchg, dupd);
-		copy.setValue(value);
-		if (mirror == null) {
-			copy.mirror = this;
-		}
-		else {
-			copy.mirror = mirror;
-		}
-		return copy;
-	}
+    @Override
+    public BdaInt32U copy() {
+        BdaInt32U copy = new BdaInt32U(objectReference, fc, sAddr, dchg, dupd);
+        copy.setValue(value);
+        if (mirror == null) {
+            copy.mirror = this;
+        } else {
+            copy.mirror = mirror;
+        }
+        return copy;
+    }
 
-	@Override
-	Data getMmsDataObj() {
-		return new Data(null, null, null, null, null, new BerInteger(value), null, null, null, null, null, null);
-	}
+    @Override
+    Data getMmsDataObj() {
+        return new Data(null, null, null, null, null, new BerInteger(value), null, null, null, null, null, null);
+    }
 
-	@Override
-	void setValueFromMmsDataObj(Data data) throws ServiceError {
-		if (data.unsigned == null) {
-			throw new ServiceError(ServiceError.TYPE_CONFLICT, "expected type: unsigned");
-		}
-		value = data.unsigned.val;
-	}
+    @Override
+    void setValueFromMmsDataObj(Data data) throws ServiceError {
+        if (data.unsigned == null) {
+            throw new ServiceError(ServiceError.TYPE_CONFLICT, "expected type: unsigned");
+        }
+        value = data.unsigned.val;
+    }
 
-	@Override
-	TypeSpecification getMmsTypeSpec() {
-		return new TypeSpecification(null, null, null, null, null, new BerInteger(32), null, null, null, null, null,
-				null);
-	}
+    @Override
+    TypeSpecification getMmsTypeSpec() {
+        return new TypeSpecification(null, null, null, null, null, new BerInteger(32), null, null, null, null, null, null);
+    }
 
-	@Override
-	public String toString() {
-		return getReference().toString() + ": " + value;
-	}
+    @Override
+    public String toString() {
+        return getReference().toString() + ": " + value;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof BdaInt32U) {
-			return value == ((BdaInt32U) obj).getValue();
-		}
-		else {
-			return false;
-		}
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof BdaInt32U) {
+            return value == ((BdaInt32U) obj).getValue();
+        } else {
+            return false;
+        }
+    }
 }

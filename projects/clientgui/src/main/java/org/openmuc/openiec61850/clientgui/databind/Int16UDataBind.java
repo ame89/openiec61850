@@ -25,31 +25,31 @@ import org.openmuc.openiec61850.BdaType;
 
 public class Int16UDataBind extends TextFieldDataBind<BdaInt16U> {
 
-	private static final UInt16Filter FILTER = new UInt16Filter();
+    private static final UInt16Filter FILTER = new UInt16Filter();
 
-	public Int16UDataBind(BdaInt16U data) {
-		super(data, BdaType.INT16U, FILTER);
-	}
+    public Int16UDataBind(BdaInt16U data) {
+        super(data, BdaType.INT16U, FILTER);
+    }
 
-	@Override
-	protected void resetImpl() {
-		inputField.setText(new Integer(data.getValue()).toString());
-	}
+    @Override
+    protected void resetImpl() {
+        inputField.setText(new Integer(data.getValue()).toString());
+    }
 
-	@Override
-	protected void writeImpl() {
-		data.setValue(Integer.parseInt(inputField.getText()));
-	}
+    @Override
+    protected void writeImpl() {
+        data.setValue(Integer.parseInt(inputField.getText()));
+    }
 
-	private static class UInt16Filter extends AbstractFilter {
-		@Override
-		protected boolean test(String text) {
-			try {
-				int value = Integer.parseInt(text);
-				return value >= 0 && value <= 0xFFFF;
-			} catch (NumberFormatException e) {
-				return false;
-			}
-		}
-	}
+    private static class UInt16Filter extends AbstractFilter {
+        @Override
+        protected boolean test(String text) {
+            try {
+                int value = Integer.parseInt(text);
+                return value >= 0 && value <= 0xFFFF;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+    }
 }

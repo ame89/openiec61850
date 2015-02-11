@@ -1,41 +1,34 @@
-
 def projectName = 'jOSITransport'
 
-tasks.withType(JavaCompile) { options.encoding = "UTF-8" }
-
-javadoc {
-    options.encoding = "UTF-8"
-}
-
 dependencies {
-  compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
 }
 
 jar {
-  manifest {
-    name = projectName
-    instruction 'Export-Package', '!*.internal.*,*'
-  }
+    manifest {
+        name = projectName
+        instruction 'Export-Package', '!*.internal.*,*'
+    }
 }
 
 uploadArchives {
-  repositories {
-    mavenDeployer {
-      pom.project {
-	name projectName
-	packaging 'jar'
-	description 'jOSITransport is a library implementing RFC 1006 and the OSI Transport Service Layer.'
-	url 'http://www.openmuc.org/'
-	
-	licenses {
-	  license {
-	    name 'GNU Lesser General Public License'
-	    url 'http://www.gnu.org/licenses/lgpl-2.1.html'
-	    distribution 'repo'
-	  }
-	}
-	
-      }
+    repositories {
+        mavenDeployer {
+            pom.project {
+                name projectName
+                packaging 'jar'
+                description 'jOSITransport is a library implementing RFC 1006 and the OSI Transport Service Layer.'
+                url 'http://www.openmuc.org/'
+
+                licenses {
+                    license {
+                        name 'GNU Lesser General Public License'
+                        url 'http://www.gnu.org/licenses/lgpl-2.1.html'
+                        distribution 'repo'
+                    }
+                }
+
+            }
+        }
     }
-  }
 }

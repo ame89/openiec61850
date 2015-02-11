@@ -25,31 +25,31 @@ import org.openmuc.openiec61850.BdaType;
 
 public class Int16DataBind extends TextFieldDataBind<BdaInt16> {
 
-	private static final Int16Filter FILTER = new Int16Filter();
+    private static final Int16Filter FILTER = new Int16Filter();
 
-	public Int16DataBind(BdaInt16 data) {
-		super(data, BdaType.INT16, FILTER);
-	}
+    public Int16DataBind(BdaInt16 data) {
+        super(data, BdaType.INT16, FILTER);
+    }
 
-	@Override
-	protected void resetImpl() {
-		inputField.setText(new Short(data.getValue()).toString());
-	}
+    @Override
+    protected void resetImpl() {
+        inputField.setText(new Short(data.getValue()).toString());
+    }
 
-	@Override
-	protected void writeImpl() {
-		data.setValue(Short.parseShort(inputField.getText()));
-	}
+    @Override
+    protected void writeImpl() {
+        data.setValue(Short.parseShort(inputField.getText()));
+    }
 
-	private static class Int16Filter extends AbstractFilter {
-		@Override
-		protected boolean test(String text) {
-			try {
-				Short.parseShort(text);
-				return true;
-			} catch (NumberFormatException e) {
-				return false;
-			}
-		}
-	}
+    private static class Int16Filter extends AbstractFilter {
+        @Override
+        protected boolean test(String text) {
+            try {
+                Short.parseShort(text);
+                return true;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+    }
 }

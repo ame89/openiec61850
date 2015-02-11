@@ -24,89 +24,84 @@ import java.util.Arrays;
 
 public final class BdaTapCommand extends BdaBitString {
 
-	public enum TapCommand {
-		STOP(0), LOWER(1), HIGHER(2), RESERVED(3);
-		private final int value;
+    public enum TapCommand {
+        STOP(0), LOWER(1), HIGHER(2), RESERVED(3);
+        private final int value;
 
-		private TapCommand(int value) {
-			this.value = value;
-		}
+        private TapCommand(int value) {
+            this.value = value;
+        }
 
-		public int getIntValue() {
-			return value;
-		}
-	}
+        public int getIntValue() {
+            return value;
+        }
+    }
 
-	public BdaTapCommand(ObjectReference objectReference, Fc fc, String sAddr, boolean dchg, boolean dupd) {
-		super(objectReference, fc, sAddr, 2, dchg, dupd);
-		basicType = BdaType.TAP_COMMAND;
-		setDefault();
-	}
+    public BdaTapCommand(ObjectReference objectReference, Fc fc, String sAddr, boolean dchg, boolean dupd) {
+        super(objectReference, fc, sAddr, 2, dchg, dupd);
+        basicType = BdaType.TAP_COMMAND;
+        setDefault();
+    }
 
-	/**
-	 * Sets the value to TapCommand.STOP
-	 */
-	@Override
-	public void setDefault() {
-		value = new byte[] { 0x00, 0x00 };
-	}
+    /**
+     * Sets the value to TapCommand.STOP
+     */
+    @Override
+    public void setDefault() {
+        value = new byte[]{0x00, 0x00};
+    }
 
-	@Override
-	public BdaTapCommand copy() {
-		BdaTapCommand copy = new BdaTapCommand(objectReference, fc, sAddr, dchg, dupd);
-		byte[] valueCopy = new byte[value.length];
-		System.arraycopy(value, 0, valueCopy, 0, value.length);
-		copy.setValue(valueCopy);
-		if (mirror == null) {
-			copy.mirror = this;
-		}
-		else {
-			copy.mirror = mirror;
-		}
-		return copy;
-	}
+    @Override
+    public BdaTapCommand copy() {
+        BdaTapCommand copy = new BdaTapCommand(objectReference, fc, sAddr, dchg, dupd);
+        byte[] valueCopy = new byte[value.length];
+        System.arraycopy(value, 0, valueCopy, 0, value.length);
+        copy.setValue(valueCopy);
+        if (mirror == null) {
+            copy.mirror = this;
+        } else {
+            copy.mirror = mirror;
+        }
+        return copy;
+    }
 
-	public TapCommand getTapCommand() {
+    public TapCommand getTapCommand() {
 
-		if ((value[0] & 0xC0) == 0xC0) {
-			return TapCommand.RESERVED;
-		}
+        if ((value[0] & 0xC0) == 0xC0) {
+            return TapCommand.RESERVED;
+        }
 
-		if ((value[0] & 0x80) == 0x80) {
-			return TapCommand.HIGHER;
-		}
+        if ((value[0] & 0x80) == 0x80) {
+            return TapCommand.HIGHER;
+        }
 
-		if ((value[0] & 0x40) == 0x40) {
-			return TapCommand.LOWER;
-		}
+        if ((value[0] & 0x40) == 0x40) {
+            return TapCommand.LOWER;
+        }
 
-		return TapCommand.STOP;
+        return TapCommand.STOP;
 
-	}
+    }
 
-	public void setTapCommand(TapCommand tapCommand) {
-		if (tapCommand == TapCommand.RESERVED) {
-			value[0] = (byte) 0xC0;
-		}
-		else if (tapCommand == TapCommand.HIGHER) {
-			value[0] = (byte) 0x80;
-		}
-		else if (tapCommand == TapCommand.LOWER) {
-			value[0] = (byte) 0x40;
-		}
-		else {
-			value[0] = (byte) 0x00;
-		}
-	}
+    public void setTapCommand(TapCommand tapCommand) {
+        if (tapCommand == TapCommand.RESERVED) {
+            value[0] = (byte) 0xC0;
+        } else if (tapCommand == TapCommand.HIGHER) {
+            value[0] = (byte) 0x80;
+        } else if (tapCommand == TapCommand.LOWER) {
+            value[0] = (byte) 0x40;
+        } else {
+            value[0] = (byte) 0x00;
+        }
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof BdaTapCommand) {
-			return Arrays.equals(value, ((BdaTapCommand) obj).getValue());
-		}
-		else {
-			return false;
-		}
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof BdaTapCommand) {
+            return Arrays.equals(value, ((BdaTapCommand) obj).getValue());
+        } else {
+            return false;
+        }
+    }
 
 }

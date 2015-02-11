@@ -1,45 +1,38 @@
-
 def projectName = 'jOSIStack'
 
-tasks.withType(JavaCompile) { options.encoding = "UTF-8" }
-
-javadoc {
-  options.encoding = "UTF-8"
-}
-
 dependencies {
-  compile project(':jositransport')
-  compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
-  compile group: 'org.openmuc', name: 'jasn1', version: '1.4'
-  compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.2'
+    compile project(':jositransport')
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
+    compile group: 'org.openmuc', name: 'jasn1', version: '1.4'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.2'
 }
 
 jar {
-  manifest {
-    name = projectName
-    instruction 'Export-Package', '!*.internal.*,*'
-  }
+    manifest {
+        name = projectName
+        instruction 'Export-Package', '!*.internal.*,*'
+    }
 }
 
 
 uploadArchives {
-  repositories {
-    mavenDeployer {
-      pom.project {
-	name projectName
-	packaging 'jar'
-	description 'jOSIStack is a library implementing the ACSE, Presentation layer and Session layer of the OSI communication stack.'
-	url 'http://www.openmuc.org/'
-	
-	licenses {
-	  license {
-	    name 'GNU Lesser General Public License'
-	    url 'http://www.gnu.org/licenses/lgpl-2.1.html'
-	    distribution 'repo'
-	  }
-	}
-	
-      }
+    repositories {
+        mavenDeployer {
+            pom.project {
+                name projectName
+                packaging 'jar'
+                description 'jOSIStack is a library implementing the ACSE, Presentation layer and Session layer of the OSI communication stack.'
+                url 'http://www.openmuc.org/'
+
+                licenses {
+                    license {
+                        name 'GNU Lesser General Public License'
+                        url 'http://www.gnu.org/licenses/lgpl-2.1.html'
+                        distribution 'repo'
+                    }
+                }
+
+            }
+        }
     }
-  }
 }

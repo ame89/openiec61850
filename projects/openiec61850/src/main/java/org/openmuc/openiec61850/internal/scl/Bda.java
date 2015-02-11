@@ -25,8 +25,8 @@ import org.w3c.dom.Node;
 
 public final class Bda extends AbstractDataAttribute {
 
-	public Bda(Node xmlNode) throws SclParseException {
-		super(xmlNode);
-	}
+    public Bda(Node xmlNode) throws SclParseException {
+        super(xmlNode);
+    }
 
 }

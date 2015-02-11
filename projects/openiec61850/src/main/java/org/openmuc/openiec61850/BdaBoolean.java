@@ -28,76 +28,74 @@ import org.openmuc.openiec61850.internal.mms.asn1.TypeSpecification;
 
 public final class BdaBoolean extends BasicDataAttribute {
 
-	private boolean value;
+    private boolean value;
 
-	public BdaBoolean(ObjectReference objectReference, Fc fc, String sAddr, boolean dchg, boolean dupd) {
-		super(objectReference, fc, sAddr, dchg, dupd);
-		basicType = BdaType.BOOLEAN;
-		setDefault();
-	}
+    public BdaBoolean(ObjectReference objectReference, Fc fc, String sAddr, boolean dchg, boolean dupd) {
+        super(objectReference, fc, sAddr, dchg, dupd);
+        basicType = BdaType.BOOLEAN;
+        setDefault();
+    }
 
-	public void setValue(boolean value) {
-		this.value = value;
-	}
+    public void setValue(boolean value) {
+        this.value = value;
+    }
 
-	@Override
-	void setValueFrom(BasicDataAttribute bda) {
-		value = ((BdaBoolean) bda).getValue();
-	}
+    @Override
+    void setValueFrom(BasicDataAttribute bda) {
+        value = ((BdaBoolean) bda).getValue();
+    }
 
-	public boolean getValue() {
-		return value;
-	}
+    public boolean getValue() {
+        return value;
+    }
 
-	@Override
-	public void setDefault() {
-		value = false;
-	}
+    @Override
+    public void setDefault() {
+        value = false;
+    }
 
-	@Override
-	public BdaBoolean copy() {
-		BdaBoolean copy = new BdaBoolean(objectReference, fc, sAddr, dchg, dupd);
-		copy.setValue(value);
-		if (mirror == null) {
-			copy.mirror = this;
-		}
-		else {
-			copy.mirror = mirror;
-		}
-		return copy;
-	}
+    @Override
+    public BdaBoolean copy() {
+        BdaBoolean copy = new BdaBoolean(objectReference, fc, sAddr, dchg, dupd);
+        copy.setValue(value);
+        if (mirror == null) {
+            copy.mirror = this;
+        } else {
+            copy.mirror = mirror;
+        }
+        return copy;
+    }
 
-	@Override
-	Data getMmsDataObj() {
-		return new Data(null, null, new BerBoolean(value), null, null, null, null, null, null, null, null, null);
-	}
+    @Override
+    Data getMmsDataObj() {
+        return new Data(null, null, new BerBoolean(value), null, null, null, null, null, null, null, null, null);
+    }
 
-	@Override
-	void setValueFromMmsDataObj(Data data) throws ServiceError {
-		if (data.boolean_ == null) {
-			throw new ServiceError(ServiceError.TYPE_CONFLICT, "expected type: boolean");
-		}
-		value = data.boolean_.val;
-	}
+    @Override
+    void setValueFromMmsDataObj(Data data) throws ServiceError {
+        if (data.boolean_ == null) {
+            throw new ServiceError(ServiceError.TYPE_CONFLICT, "expected type: boolean");
+        }
+        value = data.boolean_.val;
+    }
 
-	@Override
-	TypeSpecification getMmsTypeSpec() {
-		return new TypeSpecification(null, null, new BerNull(), null, null, null, null, null, null, null, null, null);
-	}
+    @Override
+    TypeSpecification getMmsTypeSpec() {
+        return new TypeSpecification(null, null, new BerNull(), null, null, null, null, null, null, null, null, null);
+    }
 
-	@Override
-	public String toString() {
-		return getReference().toString() + ": " + value;
-	}
+    @Override
+    public String toString() {
+        return getReference().toString() + ": " + value;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof BdaBoolean) {
-			return value == ((BdaBoolean) obj).getValue();
-		}
-		else {
-			return false;
-		}
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof BdaBoolean) {
+            return value == ((BdaBoolean) obj).getValue();
+        } else {
+            return false;
+        }
+    }
 
 }

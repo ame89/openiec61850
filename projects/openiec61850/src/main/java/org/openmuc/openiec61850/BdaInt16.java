@@ -27,77 +27,74 @@ import org.openmuc.openiec61850.internal.mms.asn1.TypeSpecification;
 
 public final class BdaInt16 extends BasicDataAttribute {
 
-	private short value;
+    private short value;
 
-	public BdaInt16(ObjectReference objectReference, Fc fc, String sAddr, boolean dchg, boolean dupd) {
-		super(objectReference, fc, sAddr, dchg, dupd);
-		basicType = BdaType.INT16;
-		setDefault();
-	}
+    public BdaInt16(ObjectReference objectReference, Fc fc, String sAddr, boolean dchg, boolean dupd) {
+        super(objectReference, fc, sAddr, dchg, dupd);
+        basicType = BdaType.INT16;
+        setDefault();
+    }
 
-	public void setValue(short value) {
-		this.value = value;
-	}
+    public void setValue(short value) {
+        this.value = value;
+    }
 
-	@Override
-	void setValueFrom(BasicDataAttribute bda) {
-		value = ((BdaInt16) bda).getValue();
-	}
+    @Override
+    void setValueFrom(BasicDataAttribute bda) {
+        value = ((BdaInt16) bda).getValue();
+    }
 
-	public short getValue() {
-		return value;
-	}
+    public short getValue() {
+        return value;
+    }
 
-	@Override
-	public void setDefault() {
-		value = 0;
-	}
+    @Override
+    public void setDefault() {
+        value = 0;
+    }
 
-	@Override
-	public BdaInt16 copy() {
-		BdaInt16 copy = new BdaInt16(objectReference, fc, sAddr, dchg, dupd);
-		copy.setValue(value);
-		if (mirror == null) {
-			copy.mirror = this;
-		}
-		else {
-			copy.mirror = mirror;
-		}
-		return copy;
-	}
+    @Override
+    public BdaInt16 copy() {
+        BdaInt16 copy = new BdaInt16(objectReference, fc, sAddr, dchg, dupd);
+        copy.setValue(value);
+        if (mirror == null) {
+            copy.mirror = this;
+        } else {
+            copy.mirror = mirror;
+        }
+        return copy;
+    }
 
-	@Override
-	Data getMmsDataObj() {
-		return new Data(null, null, null, null, new BerInteger(value), null, null, null, null, null, null, null);
-	}
+    @Override
+    Data getMmsDataObj() {
+        return new Data(null, null, null, null, new BerInteger(value), null, null, null, null, null, null, null);
+    }
 
-	@Override
-	void setValueFromMmsDataObj(Data data) throws ServiceError {
-		if (data.integer == null) {
-			throw new ServiceError(ServiceError.TYPE_CONFLICT, "expected type: integer");
-		}
-		value = (short) data.integer.val;
-	}
+    @Override
+    void setValueFromMmsDataObj(Data data) throws ServiceError {
+        if (data.integer == null) {
+            throw new ServiceError(ServiceError.TYPE_CONFLICT, "expected type: integer");
+        }
+        value = (short) data.integer.val;
+    }
 
-	@Override
-	TypeSpecification getMmsTypeSpec() {
-		return new TypeSpecification(null, null, null, null, new BerInteger(16), null, null, null, null, null, null,
-				null);
-	}
+    @Override
+    TypeSpecification getMmsTypeSpec() {
+        return new TypeSpecification(null, null, null, null, new BerInteger(16), null, null, null, null, null, null, null);
+    }
 
-	@Override
-	public String toString() {
-		return getReference().toString() + ": " + value;
-	}
+    @Override
+    public String toString() {
+        return getReference().toString() + ": " + value;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof BdaInt16) {
-			return value == ((BdaInt16) obj).getValue();
-		}
-		else {
-			return false;
-		}
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof BdaInt16) {
+            return value == ((BdaInt16) obj).getValue();
+        } else {
+            return false;
+        }
+    }
 
 }
