@@ -1,6 +1,6 @@
 # OpenIEC61850 - Overview [![Build Status](https://travis-ci.org/gythialy/openiec61850.svg)](https://travis-ci.org/gythialy/openiec61850)
 
-This is UNOFFICIAL, fork from [openmuc](http://www.openmuc.org/index.php?id=35).
+This is **UNOFFICIAL**, fork from [openmuc](http://www.openmuc.org/index.php?id=35).
 
 OpenIEC61850 is an open source implementation of the IEC 61850 standards series licensed under the LGPL. The library is written in Java and consists of an MMS client and server. Up to now the following ACSI services are supported:
  
@@ -17,4 +17,13 @@ Read the user guide on how to get started with the library.
 
 Development of OpenIEC61850 was started by [Fraunhofer ISE, energy & meteo Systems](http://www.ise.fraunhofer.de/en) GmbH, and [OFFIS](http://www.offis.de/en/start.html) as part of the [eTelligence](http://www.etelligence.de/etelligence.php) research project funded by Germany's [Federal Ministery of Economics and Technology](http://www.bmwi.de/en/). Now that the research project has ended OpenIEC61850 is actively maintained by Fraunhofer ISE.
 
-In cases where Java is not an option (e.g. if you want to implement a server on very resource constrained systems) you can also consider [libiec61850](http://libiec61850.com/).
+In cases where Java is not an option (e.g. if you want to implement a server on very resource constrained systems) you can also consider [libiec61850](http://libiec61850.com/) which is an alternative implementation in C by Michael Zillgith. 
+
+Authors: 
+- Stefan Feuerhahn
+- Chau Do
+- Michael Zillgith (Fraunhofer ISE)
+- Claus Brunzema
+- Tobias Weidelt
+- Bertram Lückehe (energy & meteo Systems) 
+- more

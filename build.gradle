@@ -13,10 +13,10 @@ allprojects {
             options.encoding = "UTF-8"
             options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
         }
-    }
 
-    javadoc {
-        options.encoding = "UTF-8"
+        tasks.withType(Javadoc) {
+            options.encoding = "UTF-8"
+        }
     }
 }
 
